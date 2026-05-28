@@ -34,6 +34,7 @@ public class MobTaczDataConfigReloadListener extends SimpleJsonResourceReloadLis
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
+        MobTaczConfigManager.clear();
         for (Map.Entry<ResourceLocation, JsonElement> entry : map.entrySet()) {
             ResourceLocation fileId = entry.getKey();
             JsonElement json = entry.getValue();
