@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.vomiter.mobstacz.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "LivingEntityAmmoCheckMixin",
+    "MobAmmoStorageMixin",
+    "MobGunAnimationSyncMixin",
+    "KineticBulletDamageModifyMixin"
+  ],
+  "client": [
+    "AbstractZombieModelMixin",
+    "HumanoidModelMixin",
+    "IllagerModelMixin",
+    "HumanoidModelGunPoseAccessMixin",
+    "IllagerModelGunPoseAccessMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "mobstacz.mixins.refmap.json"
+}
