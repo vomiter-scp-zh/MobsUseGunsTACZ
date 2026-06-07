@@ -7,7 +7,6 @@ import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.MobsTacz;
 import com.vomiter.mobstacz.common.entity.IAmmoStorage;
 import com.vomiter.mobstacz.common.entity.MobGunAnimationSyncHelper;
-import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -30,9 +29,6 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     private int unseenTicks;
 
     // 射擊後準心飄移
-    private float aimYawOffset;
-    private float aimPitchOffset;
-
     public CrazyShooterShootingGoal(
             Mob shooter,
             double moveSpeed,
@@ -76,8 +72,6 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     public void start() {
         nextAttackTick = 0;
         unseenTicks = 0;
-        aimYawOffset = 0.0F;
-        aimPitchOffset = 0.0F;
     }
 
     @Override
@@ -85,8 +79,6 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         shooter.getNavigation().stop();
         nextAttackTick = 0;
         unseenTicks = 0;
-        aimYawOffset = 0.0F;
-        aimPitchOffset = 0.0F;
     }
 
     @Override
@@ -97,6 +89,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     @Override
     public void tick() {
         LivingEntity target = shooter.getTarget();
+        IGunState shooterState = (IGunState)(shooter);
         if (target == null) return;
 
         boolean canSee = shooter.getSensing().hasLineOfSight(target);
@@ -108,7 +101,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
             unseenTicks++;
         }
 
-        if(shooter.tickCount % 10 == 0) decayAimDrift();
+        if(shooter.tickCount % 10 == 0) shooterState.mtacz$decayAimDrift();
 
         double dx = target.getX() - shooter.getX();
         double dy = target.getEyeY() - shooter.getEyeY();
@@ -117,8 +110,8 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         float baseYaw = (float) -Math.toDegrees(Math.atan2(dx, dz));
         float basePitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
 
-        float finalYaw = baseYaw + aimYawOffset;
-        float finalPitch = basePitch + aimPitchOffset;
+        float finalYaw = baseYaw + shooterState.mtacz$getAimYawOffset();
+        float finalPitch = basePitch + shooterState.mtacz$getAimPitchOffset();
 
         setRot(finalYaw, finalPitch);
         shooter.getLookControl().setLookAt(target, 30.0F, 30.0F);
@@ -203,22 +196,11 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
 
     private void applyRecoilDrift() {
         // 向上飄 + 左右隨機
-        aimPitchOffset -= 2.0F + shooter.getRandom().nextFloat() * 1.5F;
-        aimYawOffset += (shooter.getRandom().nextFloat() - 0.5F) * 2.4F;
-
-        aimPitchOffset = Mth.clamp(aimPitchOffset, -12.0F, 6.0F);
-        aimYawOffset = Mth.clamp(aimYawOffset, -10.0F, 10.0F);
-    }
-
-    private void decayAimDrift() {
-        aimPitchOffset = approachZero(aimPitchOffset, 0.35F);
-        aimYawOffset = approachZero(aimYawOffset, 0.25F);
-    }
-
-    private float approachZero(float value, float amount) {
-        if (value > 0) return Math.max(0, value - amount);
-        if (value < 0) return Math.min(0, value + amount);
-        return 0;
+        IGunState shooterState = (IGunState)(shooter);
+        shooterState.mtacz$addAimYawOffset((shooter.getRandom().nextFloat() - 0.5F) * 2.4F);
+        shooterState.mtacz$addAimPitchOffset(-2.0F - shooter.getRandom().nextFloat() * 1.5F);
+        shooterState.mtacz$clampYawOffset(-10f, 10f);
+        shooterState.mtacz$clampPitchOffset(-12, 6);
     }
 
     private int randomBetween(int min, int max) {
