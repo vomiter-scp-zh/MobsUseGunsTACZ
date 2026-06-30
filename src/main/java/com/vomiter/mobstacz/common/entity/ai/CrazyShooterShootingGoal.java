@@ -24,6 +24,8 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     private final int minAttackInterval;
     private final int maxAttackInterval;
     private final int loseSightTolerance;
+    private final float offsetTolerance;
+
 
     private int nextAttackTick;
     private int unseenTicks;
@@ -35,7 +37,8 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
             float attackRange,
             int minAttackInterval,
             int maxAttackInterval,
-            int loseSightTolerance
+            int loseSightTolerance,
+            float offsetTolerance
     ) {
         this.shooter = shooter;
         this.moveSpeed = moveSpeed;
@@ -43,6 +46,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         this.minAttackInterval = minAttackInterval;
         this.maxAttackInterval = maxAttackInterval;
         this.loseSightTolerance = loseSightTolerance;
+        this.offsetTolerance = offsetTolerance;
 
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
@@ -50,6 +54,14 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     @Override
     public boolean canUse() {
         LivingEntity target = shooter.getTarget();
+        IGunState shooterState = (IGunState)(shooter);
+        var maxOffset
+                = Math.max(
+                Math.abs(shooterState.mtacz$getAimPitchOffset()),
+                Math.abs(shooterState.mtacz$getAimYawOffset())
+        );
+        if(maxOffset > 0.01) return false;
+
         return target != null
                 && target.isAlive()
                 && IGun.mainHandHoldGun(shooter)
@@ -60,6 +72,14 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     @Override
     public boolean canContinueToUse() {
         LivingEntity target = shooter.getTarget();
+        IGunState shooterState = (IGunState)(shooter);
+        var maxOffset
+                = Math.max(
+                Math.abs(shooterState.mtacz$getAimPitchOffset()),
+                Math.abs(shooterState.mtacz$getAimYawOffset())
+        );
+        if(maxOffset > offsetTolerance) return false;
+
         return target != null
                 && target.isAlive()
                 && IGun.mainHandHoldGun(shooter)
@@ -89,7 +109,6 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     @Override
     public void tick() {
         LivingEntity target = shooter.getTarget();
-        IGunState shooterState = (IGunState)(shooter);
         if (target == null) return;
 
         boolean canSee = shooter.getSensing().hasLineOfSight(target);
@@ -101,17 +120,16 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
             unseenTicks++;
         }
 
-        if(shooter.tickCount % 10 == 0) shooterState.mtacz$decayAimDrift();
+        double targetX = target.getX();
+        double targetY = target.getBoundingBox().getCenter().y;
+        double targetZ = target.getZ();
 
-        double dx = target.getX() - shooter.getX();
-        double dy = target.getEyeY() - shooter.getEyeY();
-        double dz = target.getZ() - shooter.getZ();
+        double dx = targetX - shooter.getX();
+        double dy = targetY - shooter.getEyeY();
+        double dz = targetZ - shooter.getZ();
 
-        float baseYaw = (float) -Math.toDegrees(Math.atan2(dx, dz));
-        float basePitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
-
-        float finalYaw = baseYaw + shooterState.mtacz$getAimYawOffset();
-        float finalPitch = basePitch + shooterState.mtacz$getAimPitchOffset();
+        float finalYaw = (float) -Math.toDegrees(Math.atan2(dx, dz));
+        float finalPitch = (float) -Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
 
         setRot(finalYaw, finalPitch);
         shooter.getLookControl().setLookAt(target, 30.0F, 30.0F);
@@ -119,7 +137,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         double distSqr = shooter.distanceToSqr(target);
         double attackRangeSqr = attackRange * attackRange;
 
-        // 很簡單的距離控制：太遠就靠近，夠近就停
+        // 太遠就靠近，夠近就停
         if (distSqr > attackRangeSqr * 0.8D) {
             shooter.getNavigation().moveTo(target, moveSpeed);
         } else {
@@ -159,6 +177,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
                     if(storage.mobstacz$getAmmoCount() <= 0){
                         shooter.spawnAtLocation(shooter.getItemBySlot(EquipmentSlot.MAINHAND));
                         shooter.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
+                        ((IGunState)shooter).mtacz$setMode(GunMode.MELEE);
                     }
                     storage.mobstacz$reduceAmmoCount(1);
                 }

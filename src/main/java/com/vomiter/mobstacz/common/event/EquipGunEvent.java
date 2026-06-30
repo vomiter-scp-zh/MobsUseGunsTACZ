@@ -22,7 +22,7 @@ public class EquipGunEvent {
         if(!event.getTo().is(ModItems.MODERN_KINETIC_GUN.get())) return;
         boolean isInjected = mob.goalSelector.getAvailableGoals().stream().anyMatch(goal -> goal.getGoal() instanceof IShootingGoal);
         if(isInjected) return;
-        var shootingGoal = new CrazyShooterShootingGoal(mob, 0.5, 8, 16, 32, 200);
+        var shootingGoal = new CrazyShooterShootingGoal(mob, 0.5, 8, 16, 32, 200, 4);
         int firstPriority = GoalMutateUtils.replaceAllMeleeWithMutated(
                 mob.goalSelector,
                 (o) -> new ShooterMeleeGoal(o, shootingGoal),

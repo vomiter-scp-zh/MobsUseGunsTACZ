@@ -1,7 +1,6 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
 import net.minecraft.util.Mth;
-import org.spongepowered.asm.mixin.Unique;
 
 public interface IGunState {
     GunMode mtacz$getMode();
@@ -17,14 +16,14 @@ public interface IGunState {
         mtacz$setAimYawOffset(mtacz$getAimYawOffset() + delta);
     }
     default void mtacz$clampPitchOffset(float a, float b){
-        mtacz$setAimPitchOffset(Mth.clamp(a, b, mtacz$getAimPitchOffset()));
+        mtacz$setAimPitchOffset(Mth.clamp(a, mtacz$getAimPitchOffset(), b));
     }
     default void mtacz$clampYawOffset(float a, float b){
-        mtacz$setAimYawOffset(Mth.clamp(a, b, mtacz$getAimYawOffset()));
+        mtacz$setAimYawOffset(Mth.clamp(a, mtacz$getAimYawOffset(), b));
     }
     default void mtacz$decayAimDrift() {
-        mtacz$setAimPitchOffset(approachZero(mtacz$getAimPitchOffset(), 0.35F));
-        mtacz$setAimYawOffset(approachZero(mtacz$getAimYawOffset(), 0.25F));
+        mtacz$setAimPitchOffset(approachZero(mtacz$getAimPitchOffset(), 0.7F));
+        mtacz$setAimYawOffset(approachZero(mtacz$getAimYawOffset(), 0.5F));
     }
 
     private float approachZero(float value, float amount) {

@@ -74,7 +74,7 @@ devRuntimeProject(":neurolib")
 /summon piglin ~ ~ ~ {IsImmuneToZombification:1,HandItems:[{id:diamond_axe,Count:1},{}]}
 /summon piglin ~ ~ ~ {IsImmuneToZombification:1, NoAI:1b}
 /summon hoglin ~ ~ ~ {IsImmuneToZombification:1,NoAI:1b}
-/summon husk ~ ~ ~ {HandItems:[{id: "tacz:modern_kinetic_gun", Count: 1b, tag: {HasBulletInBarrel: 1b, GunFireMode: "AUTO", GunId: "tacz:type_81", GunCurrentAmmoCount: 29}}
+/summon husk ~ ~ ~ {HandItems:[{id: "tacz:modern_kinetic_gun", Count: 1b, tag: {HasBulletInBarrel: 1b, GunFireMode: "AUTO", GunId: "tacz:glock_17", GunCurrentAmmoCount: 29}}
 ,{}]}
 /summon pillager ~ ~ ~ {HandItems:[{id: "tacz:modern_kinetic_gun", Count: 1b, tag: {HasBulletInBarrel: 1b, GunFireMode: "AUTO", GunId: "tacz:type_81", GunCurrentAmmoCount: 29}}
 ,{}]}
