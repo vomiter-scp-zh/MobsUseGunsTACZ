@@ -12,4 +12,9 @@ public interface IAmmoStorage {
         MobsTacz.LOGGER.info("[MTACZ] Consuming Ammo");
         mobstacz$setAmmoCount(Math.max(mobstacz$getAmmoCount() - i, 0));
     }
+
+    default void mobstacz$addAmmoCount(int i){
+        mobstacz$setAmmoCount(Math.max(mobstacz$getAmmoCount() + i, 0));
+    }
+
 }

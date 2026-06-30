@@ -49,6 +49,7 @@ dependencies {
     annotationProcessor("org.spongepowered:mixin:${mixin_version}:processor")
     implementation fg.deobf("curse.maven:timeless-and-classics-zero-1028108:7745481")
     runtimeOnly fg.deobf("curse.maven:playeranimator-658587:4587214")
+    implementation fg.deobf("curse.maven:neurolib-1484243:7897734")
 }
 
 def devRuntimeProject(String path) {
@@ -65,7 +66,7 @@ def devRuntimeProject(String path) {
         dependsOn("${path}:devJar")
     }
 }
-devRuntimeProject(":neurolib")
+//devRuntimeProject(":neurolib")
 
 //devRuntime.project(":common", true)
 

@@ -12,7 +12,7 @@ public class ShooterMeleeGoal extends MutatedMeleeGoal {
 
         setExtraUseCheck(goal -> {
             if(goal instanceof MeleeAttackGoalAccessor acc){
-                if(acc.getMob() instanceof IGunState gunState){
+                if(acc.getMob() instanceof IMobGunState gunState){
                     return gunState.mtacz$getMode() == GunMode.MELEE;
                 }
             }
