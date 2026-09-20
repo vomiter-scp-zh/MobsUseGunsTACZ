@@ -3,13 +3,7 @@ package com.vomiter.mobstacz.common.entity.ai;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
-import com.vomiter.mobstacz.Config;
-import com.vomiter.mobstacz.MobsTacz;
-import com.vomiter.mobstacz.common.entity.MobGunAnimationSyncHelper;
 import com.vomiter.mobstacz.common.entity.MobGunUtils;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -52,36 +46,26 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
 
     @Override
     public boolean canUse() {
-        LivingEntity target = shooter.getTarget();
-        IMobGunState shooterState = (IMobGunState)(shooter);
-        if(shooterState.mtacz$getMode() != GunMode.FIRE) return false;
-        return target != null
-                && target.isAlive()
-                && IGun.mainHandHoldGun(shooter)
-                && shooter.distanceToSqr(target) <= (attackRange * attackRange) * 2.25
-                ;
+        return canFireGoalRun();
     }
 
     @Override
     public boolean canContinueToUse() {
+        return canFireGoalRun()
+                && unseenTicks <= loseSightTolerance;
+    }
+
+    private boolean canFireGoalRun() {
         LivingEntity target = shooter.getTarget();
-        IMobGunState shooterState = (IMobGunState)(shooter);
-        if(shooterState.mtacz$getMode() != GunMode.FIRE) return false;
-        var maxOffset
-                = Math.max(
-                Math.abs(shooterState.mtacz$getAimPitchOffset()),
-                Math.abs(shooterState.mtacz$getAimYawOffset())
-        );
-        if(maxOffset > offsetTolerance){
-            shooterState.mtacz$setMode(GunMode.AIM);
-            return false;
-        }
-        return target != null
+        IMobGunState state = (IMobGunState) shooter;
+
+        return state.mtacz$getMode() == GunMode.RANGED
+                && state.mtacz$getMaxAimOffset() <= offsetTolerance
+                && target != null
                 && target.isAlive()
                 && IGun.mainHandHoldGun(shooter)
-                && unseenTicks <= loseSightTolerance
-                && shooter.distanceToSqr(target) <= (attackRange * attackRange) * 2.25
-                ;
+                && shooter.distanceToSqr(target)
+                <= attackRange * attackRange * 2.25D;
     }
 
     @Override
@@ -157,44 +141,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         IGunOperator gunOperator = IGunOperator.fromLivingEntity(shooter);
         ShootResult result = gunOperator.shoot(() -> finalPitch, () -> finalYaw);
         IMobGunState shooterState = (IMobGunState) shooter;
-
-        switch (result) {
-            case SUCCESS -> {
-                applyRecoilDrift();
-                if(Config.MOB_GLOWS_AFTER_SHOOTING) shooter.addEffect(new MobEffectInstance(MobEffects.GLOWING, 600, 0));
-                nextAttackTick = randomBetween(minAttackInterval, maxAttackInterval);
-            }
-            case NOT_DRAW -> {
-                gunOperator.draw(shooter::getMainHandItem);
-                nextAttackTick = 4;
-            }
-            case NO_AMMO -> {
-                if(MobGunUtils.canReload(shooter)){
-                    shooterState.mtacz$setMode(GunMode.RELOAD);
-                }
-                else {
-                    shooterState.mtacz$setMode(GunMode.MELEE);
-                }
-                nextAttackTick = 100;
-            }
-            case NEED_BOLT -> {
-                nextAttackTick = 6;
-            }
-            case COOL_DOWN, IS_RELOADING, IS_DRAWING, IS_BOLTING, OVERHEATED -> {
-                nextAttackTick = 4;
-            }
-            case IS_SPRINTING -> {
-                // Mob 通常不太會 sprint 開槍，但還是保守處理
-                nextAttackTick = 4;
-            }
-            case IS_MELEE -> {
-                // 代表武器/狀態目前切到近戰流程，先稍等
-                nextAttackTick = 6;
-            }
-            case NOT_GUN, ID_NOT_EXIST, NETWORK_FAIL, FORGE_EVENT_CANCEL, UNKNOWN_FAIL -> {
-                nextAttackTick = 10;
-            }
-        }
+        handleShootResult(result, gunOperator, shooterState);
     }
 
     private void setRot(float yaw, float pitch) {
@@ -217,5 +164,50 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     private int randomBetween(int min, int max) {
         if (max <= min) return min;
         return min + shooter.getRandom().nextInt(max - min + 1);
+    }
+
+    private void handleShootResult(ShootResult result, IGunOperator operator, IMobGunState state) {
+        switch (result) {
+            case SUCCESS -> {
+                applyRecoilDrift();
+                nextAttackTick = randomBetween(
+                        minAttackInterval,
+                        maxAttackInterval
+                );
+            }
+
+            case NOT_DRAW -> {
+                operator.draw(shooter::getMainHandItem);
+                nextAttackTick = 4;
+            }
+
+            case NEED_BOLT -> {
+                operator.bolt();
+                nextAttackTick = 4;
+            }
+
+            case NO_AMMO -> {
+                if (MobGunUtils.canReload(shooter)) {
+                    state.mtacz$setMode(GunMode.RELOAD);
+                } else {
+                    state.mtacz$setMode(GunMode.MELEE);
+                }
+            }
+
+            case IS_RELOADING -> {
+                // 例如其他系統已經讓 TACZ 開始換彈。
+                state.mtacz$setMode(GunMode.RELOAD);
+            }
+
+            case COOL_DOWN, IS_DRAWING, IS_BOLTING -> {
+                nextAttackTick = 4;
+            }
+
+            case OVERHEATED -> {
+                nextAttackTick = 10;
+            }
+
+            default -> nextAttackTick = 10;
+        }
     }
 }

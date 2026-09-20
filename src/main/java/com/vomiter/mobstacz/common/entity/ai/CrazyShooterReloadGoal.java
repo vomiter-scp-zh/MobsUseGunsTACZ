@@ -1,95 +1,104 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
-import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.resource.index.CommonGunIndex;
-import com.tacz.guns.resource.pojo.data.gun.GunData;
-import com.vomiter.mobstacz.MobsTacz;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.EnumSet;
-import java.util.OptionalInt;
 
 public class CrazyShooterReloadGoal extends Goal implements IShootingGoal {
-    private final Mob shooter;
-    private int nextAttackTick;
 
-    public CrazyShooterReloadGoal(
-            Mob shooter
-    ) {
+    private final Mob shooter;
+    private boolean reloadStarted;
+
+    public CrazyShooterReloadGoal(Mob shooter) {
         this.shooter = shooter;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
     }
 
     @Override
     public boolean canUse() {
-        IMobGunState mobGunState = (IMobGunState) shooter;
-        return GunMode.RELOAD.equals(mobGunState.mtacz$getMode());
+        IMobGunState state = (IMobGunState) shooter;
+
+        return state.mtacz$getMode() == GunMode.RELOAD
+                && IGun.mainHandHoldGun(shooter);
     }
 
     @Override
     public boolean canContinueToUse() {
-        return nextAttackTick > 0;
+        IMobGunState state = (IMobGunState) shooter;
+
+        return state.mtacz$getMode() == GunMode.RELOAD
+                && IGun.mainHandHoldGun(shooter);
     }
 
     @Override
     public void start() {
-        //MobsTacz.LOGGER.info("[MTACZ] reload start");
-        var reloadSecond = getTaczReloadTicks(shooter.getMainHandItem(), true, false);
-        if(reloadSecond.isPresent()){
-            nextAttackTick = reloadSecond.getAsInt() + 10;
-            MobsTacz.LOGGER.info("[MTACZ] reload time of {} for entity {} is {}", shooter.getMainHandItem(), shooter, nextAttackTick);
-            var gunOperator = IGunOperator.fromLivingEntity(shooter);
-            gunOperator.reload();
+        shooter.getNavigation().stop();
+
+        IGunOperator operator = IGunOperator.fromLivingEntity(shooter);
+
+        if (isReloading(operator)) {
+            reloadStarted = true;
+            return;
         }
-        else {
-            MobsTacz.LOGGER.warn("[MTACZ] Failed to get reload time of {} for entity {}", shooter.getMainHandItem(), shooter);
+
+        if (!MobGunUtils.canReload(shooter)) {
+            reloadStarted = false;
+            ((IMobGunState) shooter)
+                    .mtacz$setMode(GunMode.MELEE);
+            return;
+        }
+
+        operator.reload();
+        reloadStarted = isReloading(operator);
+
+        if (!reloadStarted) {
+            // event 被取消、gun script 拒絕開始，或其他條件失敗。
+            ((IMobGunState) shooter).mtacz$setMode(GunMode.MELEE);
+        }
+    }
+
+    @Override
+    public void tick() {
+        if (!reloadStarted) {
+            return;
+        }
+
+        IGunOperator operator = IGunOperator.fromLivingEntity(shooter);
+
+        if (!isReloading(operator)) {
+            reloadStarted = false;
+
+            IMobGunState state = (IMobGunState) shooter;
+            state.mtacz$setAimPitchOffset(0);
+            state.mtacz$setAimYawOffset(0);
+            state.mtacz$setMode(GunMode.RANGED);
         }
     }
 
     @Override
     public void stop() {
-        //MobsTacz.LOGGER.info("[MTACZ] reload stop");
+        IGunOperator operator = IGunOperator.fromLivingEntity(shooter);
+
+        if (reloadStarted && isReloading(operator)) {
+            operator.cancelReload();
+        }
+
+        reloadStarted = false;
         shooter.getNavigation().stop();
-        nextAttackTick = 0;
-        IMobGunState mobGunState = (IMobGunState) shooter;
-        mobGunState.mtacz$setAimPitchOffset(0);
-        mobGunState.mtacz$setAimYawOffset(0);
-        //MobsTacz.LOGGER.info("[MTACZ] Resume shooting");
-        mobGunState.mtacz$setMode(GunMode.FIRE);
+    }
+
+    private boolean isReloading(IGunOperator operator) {
+        return operator.getDataHolder()
+                .reloadStateType
+                .isReloading();
     }
 
     @Override
     public boolean requiresUpdateEveryTick() {
         return true;
-    }
-
-    @Override
-    public void tick() {
-        if (nextAttackTick > 0) {
-            nextAttackTick--;
-        }
-    }
-
-    private OptionalInt getTaczReloadTicks(ItemStack stack, boolean emptyReload, boolean feedTime) {
-        if (!(stack.getItem() instanceof IGun gun)) {
-            return OptionalInt.empty();
-        }
-
-        ResourceLocation gunId = gun.getGunId(stack);
-
-        return TimelessAPI.getCommonGunIndex(gunId)
-                .map(CommonGunIndex::getGunData)
-                .map(GunData::getReloadData)
-                .map(reloadData -> feedTime ? reloadData.getFeed() : reloadData.getCooldown())
-                .map(time -> emptyReload ? time.getEmptyTime() : time.getTacticalTime())
-                .map(seconds -> Mth.ceil(seconds * 20.0F))
-                .map(OptionalInt::of)
-                .orElse(OptionalInt.empty());
     }
 }

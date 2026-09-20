@@ -48,4 +48,10 @@ public interface IMobGunState {
         return 0;
     }
 
+    default float mtacz$getMaxAimOffset(){
+        return Math.max(
+                Math.abs(mtacz$getAimPitchOffset()),
+                Math.abs(mtacz$getAimYawOffset())
+        );
+    };
 }

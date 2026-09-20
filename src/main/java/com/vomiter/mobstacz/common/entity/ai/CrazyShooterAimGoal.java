@@ -1,6 +1,5 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
-import com.vomiter.mobstacz.MobsTacz;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -26,19 +25,13 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
     @Override
     public boolean canUse() {
         IMobGunState mobGunState = (IMobGunState) shooter;
-        return GunMode.AIM.equals(mobGunState.mtacz$getMode());
+        boolean isRanged = mobGunState.mtacz$getMode().equals(GunMode.RANGED);
+        return isRanged && mobGunState.mtacz$getMaxAimOffset() > minOffsetTolerance;
     }
 
     @Override
     public boolean canContinueToUse() {
-        IMobGunState mobGunState = (IMobGunState) shooter;
-        var maxOffset
-                = Math.max(
-                Math.abs(mobGunState.mtacz$getAimPitchOffset()),
-                Math.abs(mobGunState.mtacz$getAimYawOffset())
-        );
-
-        return maxOffset > minOffsetTolerance;
+        return canUse();
     }
 
     @Override
@@ -48,9 +41,6 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
 
     @Override
     public void stop() {
-        //MobsTacz.LOGGER.info("[MTACZ] aim stop");
-        IMobGunState mobGunState = (IMobGunState) shooter;
-        mobGunState.mtacz$setMode(GunMode.FIRE);
     }
 
     @Override
