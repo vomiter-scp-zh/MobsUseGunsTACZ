@@ -7,6 +7,7 @@ import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.MobsTacz;
 import com.vomiter.mobstacz.common.entity.MobGunAnimationSyncHelper;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
@@ -168,7 +169,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
                 nextAttackTick = 4;
             }
             case NO_AMMO -> {
-                if(shooterState.canReload()){
+                if(MobGunUtils.canReload(shooter)){
                     shooterState.mtacz$setMode(GunMode.RELOAD);
                 }
                 else {

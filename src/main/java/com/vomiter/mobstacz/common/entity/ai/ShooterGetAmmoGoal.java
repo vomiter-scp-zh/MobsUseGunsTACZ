@@ -1,6 +1,7 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
 import com.tacz.guns.api.item.IAmmo;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import com.vomiter.neurolib.common.entity.gather.MobMoveToDroppedItemGoal;
 import net.minecraft.world.entity.PathfinderMob;
@@ -46,14 +47,14 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
     protected boolean canStartAction() {
         IMobGunState shooterState = (IMobGunState) mob;
         if(shooterState.getGunIndex().isEmpty()) return false;
-        return !shooterState.canReload();
+        return !MobGunUtils.canReload(mob);
     }
 
     @Override
     protected boolean canContinueAction() {
         IMobGunState shooterState = (IMobGunState) mob;
         if(shooterState.getGunIndex().isEmpty()) return false;
-        return !shooterState.canReload();
+        return !MobGunUtils.canReload(mob);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
             target.setItem(remainder);
         }
 
-        if (shooterState.canReload()) {
+        if (MobGunUtils.canReload(mob)) {
             shooterState.mtacz$setMode(GunMode.RELOAD);
         }
     }

@@ -2,7 +2,6 @@ package com.vomiter.mobstacz.common.entity.ai;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
-import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
@@ -27,7 +26,7 @@ public interface IMobGunState {
         mtacz$setAimPitchOffset(Mth.clamp(a, mtacz$getAimPitchOffset(), b));
     }
     default void mtacz$clampYawOffset(float a, float b){
-        mtacz$setAimYawOffset(Mth.clamp(a, mtacz$getAimYawOffset(), b));
+        mtacz$setAimYawOffset(Mth.clamp(mtacz$getAimYawOffset(), a, b));
     }
     default void mtacz$decayAimDrift() {
         mtacz$setAimPitchOffset(approachZero(mtacz$getAimPitchOffset(), 0.7F));
@@ -49,12 +48,4 @@ public interface IMobGunState {
         return 0;
     }
 
-    default boolean canReload(){
-        if(this instanceof Mob shooter
-            && shooter.getMainHandItem().getItem() instanceof AbstractGunItem gunItem
-            && gunItem.canReload(shooter, shooter.getMainHandItem())){
-            return true;
-        }
-        return false;
-    }
 }

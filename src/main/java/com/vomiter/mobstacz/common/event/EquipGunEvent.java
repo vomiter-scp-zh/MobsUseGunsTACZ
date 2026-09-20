@@ -6,6 +6,7 @@ import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.init.ModItems;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
 import com.vomiter.mobstacz.MobsTacz;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import com.vomiter.mobstacz.common.entity.ai.*;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import com.vomiter.neurolib.common.entity.generic.GoalMutateUtils;
@@ -47,54 +48,7 @@ public class EquipGunEvent {
             state.mtacz$setMode(GunMode.FIRE);
         }
 
-        //giveAmmoStack(mob, event.getTo());
+        MobGunUtils.giveInitialAmmoStack(mob, event.getTo());
     }
 
-    private static void giveAmmoStack(Mob mob, ItemStack gunStack) {
-        IGun gun = IGun.getIGunOrNull(gunStack);
-        if (gun == null) {
-            return;
-        }
-
-        ResourceLocation gunId = gun.getGunId(gunStack);
-
-        var gunIndexOptional = TimelessAPI.getCommonGunIndex(gunId);
-        if (gunIndexOptional.isEmpty()) {
-            MobsTacz.LOGGER.warn(
-                    "[MobsTacz] Cannot find gun index for {}",
-                    gunId
-            );
-            return;
-        }
-
-        ResourceLocation ammoId = gunIndexOptional
-                .get()
-                .getGunData()
-                .getAmmoId();
-
-        int stackSize = TimelessAPI
-                .getCommonAmmoIndex(ammoId)
-                .map(CommonAmmoIndex::getStackSize)
-                .orElse(1);
-
-        ItemStack ammoStack = AmmoItemBuilder.create()
-                .setId(ammoId)
-                .setCount(stackSize)
-                .build();
-
-        ItemStack remainder = mob
-                .getCapability(ModCapabilities.MOB_AMMO)
-                .map(ammoInventory ->
-                        ItemHandlerHelper.insertItemStacked(
-                                ammoInventory,
-                                ammoStack,
-                                false
-                        )
-                )
-                .orElse(ammoStack);
-
-        if (!remainder.isEmpty()) {
-            mob.spawnAtLocation(remainder);
-        }
-    }
 }
