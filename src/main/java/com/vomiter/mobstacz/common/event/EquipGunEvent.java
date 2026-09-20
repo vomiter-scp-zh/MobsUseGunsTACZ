@@ -47,7 +47,7 @@ public class EquipGunEvent {
             state.mtacz$setMode(GunMode.FIRE);
         }
 
-        giveAmmoStack(mob, event.getTo());
+        //giveAmmoStack(mob, event.getTo());
     }
 
     private static void giveAmmoStack(Mob mob, ItemStack gunStack) {

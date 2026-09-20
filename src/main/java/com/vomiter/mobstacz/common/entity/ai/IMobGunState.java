@@ -53,6 +53,7 @@ public interface IMobGunState {
         if(this instanceof Mob shooter
             && shooter.getMainHandItem().getItem() instanceof AbstractGunItem gunItem
             && gunItem.canReload(shooter, shooter.getMainHandItem())){
+            return true;
         }
         return false;
     }

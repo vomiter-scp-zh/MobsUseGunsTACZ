@@ -6,6 +6,7 @@ import com.vomiter.neurolib.common.entity.gather.MobMoveToDroppedItemGoal;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.items.ItemHandlerHelper;
 
 public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> {
 
@@ -72,13 +73,36 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
     @Override
     protected void onReachedTarget(ItemEntity target) {
         IMobGunState shooterState = (IMobGunState) mob;
-        mob.getCapability(ModCapabilities.MOB_AMMO).ifPresent(iMobAmmoHandler -> {
-            for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
-                iMobAmmoHandler.insertItem(i, target.getItem(), false);
-            }
-        });
-        target.discard();
-        shooterState.mtacz$setMode(GunMode.RELOAD);
+
+        ItemStack original = target.getItem();
+        int originalCount = original.getCount();
+
+        ItemStack remainder = mob
+                .getCapability(ModCapabilities.MOB_AMMO)
+                .map(ammoInventory ->
+                        ItemHandlerHelper.insertItemStacked(
+                                ammoInventory,
+                                original.copy(),
+                                false
+                        )
+                )
+                .orElse(original.copy());
+
+        int insertedCount = originalCount - remainder.getCount();
+
+        if (insertedCount <= 0) {
+            return;
+        }
+
+        if (remainder.isEmpty()) {
+            target.discard();
+        } else {
+            target.setItem(remainder);
+        }
+
+        if (shooterState.canReload()) {
+            shooterState.mtacz$setMode(GunMode.RELOAD);
+        }
     }
 
 

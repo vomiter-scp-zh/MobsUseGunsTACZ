@@ -43,9 +43,10 @@ public abstract class ModernKineticGunScriptAPIMixin {
                             if (found >= missingCount) return found;
                             int toDraw = missingCount - found;
                             ItemStack ammoStack = iMobAmmoHandler.getStackInSlot(i);
-                            if (ammoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(itemStack, ammoStack)){
-                                found += Math.min(ammoStack.getCount(), toDraw);
-                                ammoStack.shrink(Math.min(ammoStack.getCount(), toDraw));
+                            if (ammoStack.getItem() instanceof IAmmo ammo
+                                    && ammo.isAmmoOfGun(itemStack, ammoStack)) {
+                                ItemStack extracted = iMobAmmoHandler.extractItem(i, toDraw, false);
+                                found += extracted.getCount();
                             } else if (ammoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(itemStack, ammoStack)) {
                                 found += Math.min(iAmmoBox.getAmmoCount(ammoStack), toDraw);
                                 iAmmoBox.setAmmoCount(ammoStack, iAmmoBox.getAmmoCount(ammoStack) - Math.min(iAmmoBox.getAmmoCount(ammoStack), toDraw));
@@ -62,38 +63,46 @@ public abstract class ModernKineticGunScriptAPIMixin {
     }
 
 
-    @Inject(method = "hasAmmoToConsume", at = @At("RETURN"), cancellable = true)
-    private void mtacz$hasAmmoToConsume(CallbackInfoReturnable<Boolean> cir){
-        if (!(this.shooter instanceof Mob mob)) return;
+    @Inject(
+            method = "hasAmmoToConsume",
+            at = @At("RETURN"),
+            cancellable = true
+    )
+    private void mtacz$hasAmmoToConsume(
+            CallbackInfoReturnable<Boolean> cir
+    ) {
+        if (cir.getReturnValue()) {
+            return;
+        }
 
-        if (!this.isReloadingNeedConsumeAmmo()) {
+        if (!(shooter instanceof Mob mob)) {
             return;
-        } else if (this.abstractGunItem.useDummyAmmo(this.itemStack)) {
-            return;
-        } else {
-            if (mob.level().isClientSide) {
-            }
-            int missingCount = 1;
-            int backpackAvailable = mob.getCapability(ModCapabilities.MOB_AMMO).map(
-                    iMobAmmoHandler -> {
-                        int found = 0;
-                        for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
-                            if (found >= missingCount) return found;
-                            int toDraw = missingCount - found;
-                            ItemStack ammoStack = iMobAmmoHandler.getStackInSlot(i);
-                            if (ammoStack.getItem() instanceof IAmmo iAmmo && iAmmo.isAmmoOfGun(itemStack, ammoStack)){
-                                found += Math.min(ammoStack.getCount(), toDraw);
-                                ammoStack.shrink(Math.min(ammoStack.getCount(), toDraw));
-                            } else if (ammoStack.getItem() instanceof IAmmoBox iAmmoBox && iAmmoBox.isAmmoBoxOfGun(itemStack, ammoStack)) {
-                                found += Math.min(iAmmoBox.getAmmoCount(ammoStack), toDraw);
-                                iAmmoBox.setAmmoCount(ammoStack, iAmmoBox.getAmmoCount(ammoStack) - Math.min(iAmmoBox.getAmmoCount(ammoStack), toDraw));
-                            }
+        }
+
+        boolean hasAmmo = mob
+                .getCapability(ModCapabilities.MOB_AMMO)
+                .map(ammoInventory -> {
+                    for (int slot = 0; slot < ammoInventory.getSlots(); slot++) {
+                        ItemStack ammoStack = ammoInventory.getStackInSlot(slot);
+
+                        if (ammoStack.getItem() instanceof IAmmo ammo
+                                && ammo.isAmmoOfGun(itemStack, ammoStack)) {
+                            return true;
                         }
-                        return found;
-                    }
-            ).orElse(0);
 
-            if (backpackAvailable > 0) cir.setReturnValue(true);
+                        if (ammoStack.getItem() instanceof IAmmoBox ammoBox
+                                && ammoBox.isAmmoBoxOfGun(itemStack, ammoStack)
+                                && ammoBox.getAmmoCount(ammoStack) > 0) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                })
+                .orElse(false);
+
+        if (hasAmmo) {
+            cir.setReturnValue(true);
         }
     }
 }
