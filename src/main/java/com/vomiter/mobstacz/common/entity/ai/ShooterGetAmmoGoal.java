@@ -1,6 +1,7 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
 import com.tacz.guns.api.item.IAmmo;
+import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import com.vomiter.neurolib.common.entity.gather.MobMoveToDroppedItemGoal;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -63,6 +64,7 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
             if(ammo != null){
                 return ammo.isAmmoOfGun(mob.getMainHandItem(), stack);
             }
+            //TODO: check inventory fullness
         }
         return false;
     }
@@ -70,7 +72,11 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
     @Override
     protected void onReachedTarget(ItemEntity target) {
         IMobGunState shooterState = (IMobGunState) mob;
-        shooterState.mtacz$getAmmo().mobstacz$addAmmoCount(target.getItem().getCount());
+        mob.getCapability(ModCapabilities.MOB_AMMO).ifPresent(iMobAmmoHandler -> {
+            for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
+                iMobAmmoHandler.insertItem(i, target.getItem(), false);
+            }
+        });
         target.discard();
         shooterState.mtacz$setMode(GunMode.RELOAD);
     }

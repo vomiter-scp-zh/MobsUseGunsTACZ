@@ -2,8 +2,8 @@ package com.vomiter.mobstacz.common.entity.ai;
 
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
-import com.vomiter.mobstacz.common.entity.IAmmoStorage;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 
@@ -34,18 +34,6 @@ public interface IMobGunState {
         mtacz$setAimYawOffset(approachZero(mtacz$getAimYawOffset(), 0.5F));
     }
 
-    default IAmmoStorage mtacz$getAmmo(){
-        if(this instanceof IAmmoStorage ammoStorage) return ammoStorage;
-        return null;
-    }
-
-    /**
-     * false if no ammo;
-     */
-    default boolean canReload(){
-        return mtacz$getAmmo().mobstacz$getAmmoCount() > 0;
-    }
-
     default Optional<CommonGunIndex> getGunIndex(){
         if(this instanceof Mob mob && IGun.mainHandHoldGun(mob)){
             var gunId = Objects.requireNonNull(IGun.getIGunOrNull(mob.getMainHandItem()))
@@ -61,5 +49,11 @@ public interface IMobGunState {
         return 0;
     }
 
-
+    default boolean canReload(){
+        if(this instanceof Mob shooter
+            && shooter.getMainHandItem().getItem() instanceof AbstractGunItem gunItem
+            && gunItem.canReload(shooter, shooter.getMainHandItem())){
+        }
+        return false;
+    }
 }

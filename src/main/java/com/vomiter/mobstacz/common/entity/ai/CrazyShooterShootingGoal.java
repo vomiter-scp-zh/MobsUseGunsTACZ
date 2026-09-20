@@ -3,6 +3,7 @@ package com.vomiter.mobstacz.common.entity.ai;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
+import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.MobsTacz;
 import com.vomiter.mobstacz.common.entity.MobGunAnimationSyncHelper;

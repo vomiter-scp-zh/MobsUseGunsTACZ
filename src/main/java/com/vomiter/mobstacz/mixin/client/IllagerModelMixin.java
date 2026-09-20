@@ -1,8 +1,7 @@
-package com.vomiter.mobstacz.mixin;
+package com.vomiter.mobstacz.mixin.client;
 
 import com.vomiter.mobstacz.client.animation.IGunPoseModelAccess;
 import com.vomiter.mobstacz.client.animation.MobGunAnimationApplier;
-import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.IllagerModel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.monster.AbstractIllager;

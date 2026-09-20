@@ -1,4 +1,4 @@
-package com.vomiter.mobstacz.mixin;
+package com.vomiter.mobstacz.mixin.client;
 
 import com.vomiter.mobstacz.client.animation.IGunPoseModelAccess;
 import net.minecraft.client.model.HumanoidModel;

@@ -6,7 +6,6 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.resource.pojo.data.gun.GunData;
 import com.vomiter.mobstacz.MobsTacz;
-import com.vomiter.mobstacz.common.entity.IAmmoStorage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
@@ -50,7 +49,6 @@ public class CrazyShooterReloadGoal extends Goal implements IShootingGoal {
         }
         else {
             MobsTacz.LOGGER.warn("[MTACZ] Failed to get reload time of {} for entity {}", shooter.getMainHandItem(), shooter);
-            ((IAmmoStorage)shooter).mobstacz$setAmmoCount(0);
         }
     }
 
@@ -64,7 +62,6 @@ public class CrazyShooterReloadGoal extends Goal implements IShootingGoal {
         mobGunState.mtacz$setAimYawOffset(0);
         //MobsTacz.LOGGER.info("[MTACZ] Resume shooting");
         mobGunState.mtacz$setMode(GunMode.FIRE);
-        mobGunState.mtacz$getAmmo().mobstacz$reduceAmmoCount(1);
     }
 
     @Override

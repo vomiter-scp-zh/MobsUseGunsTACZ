@@ -2,6 +2,7 @@ package com.vomiter.mobstacz;
 
 import com.mojang.logging.LogUtils;
 import com.tacz.guns.api.item.IGun;
+import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import com.vomiter.mobstacz.common.event.EventHandler;
 import com.vomiter.mobstacz.common.registry.ModRegistries;
 import com.vomiter.mobstacz.data.ModDataGenerator;
@@ -16,7 +17,10 @@ import org.slf4j.Logger;
 @Mod(MobsTacz.MOD_ID)
 public class MobsTacz
 {
-    // Define mod id in a common place for everything to reference
+    //TODO: make reload play sound
+    //TODO: make get ammo more clever
+    //TODO: make ammo count synced
+    //TODO: make ammo drop
     public static final String MOD_ID = "mobstacz";
     public static final Logger LOGGER = LogUtils.getLogger();
 
@@ -31,6 +35,7 @@ public class MobsTacz
         modBus.addListener(ModDataGenerator::generateData);
         ModRegistries.register(modBus);
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        modBus.addListener(ModCapabilities::onRegisterCapabilities);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)

@@ -4,18 +4,18 @@
   "package": "com.vomiter.mobstacz.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "LivingEntityAmmoCheckMixin",
-    "MobAmmoStorageMixin",
     "MobGunAnimationSyncMixin",
     "KineticBulletDamageModifyMixin",
-    "LivingEntityGunStateMixin"
+    "LivingEntityGunStateMixin",
+    "reload.ModernKineticGunScriptAPIMixin",
+    "reload.AbstractGunMixin"
   ],
   "client": [
-    "AbstractZombieModelMixin",
-    "HumanoidModelMixin",
-    "IllagerModelMixin",
-    "HumanoidModelGunPoseAccessMixin",
-    "IllagerModelGunPoseAccessMixin"
+    "client.AbstractZombieModelMixin",
+    "client.HumanoidModelMixin",
+    "client.IllagerModelMixin",
+    "client.HumanoidModelGunPoseAccessMixin",
+    "client.IllagerModelGunPoseAccessMixin"
   ],
   "injectors": {
     "defaultRequire": 1

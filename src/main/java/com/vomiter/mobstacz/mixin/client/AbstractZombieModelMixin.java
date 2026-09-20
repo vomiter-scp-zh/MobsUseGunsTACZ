@@ -1,21 +1,24 @@
-package com.vomiter.mobstacz.mixin;
+package com.vomiter.mobstacz.mixin.client;
 
 import com.vomiter.mobstacz.client.animation.IGunPoseModelAccess;
 import com.vomiter.mobstacz.client.animation.MobGunAnimationApplier;
 import net.minecraft.client.model.AbstractZombieModel;
-import net.minecraft.client.model.AgeableListModel;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.world.entity.monster.Monster;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(HumanoidModel.class)
-public abstract class HumanoidModelMixin<T extends LivingEntity> extends AgeableListModel<T> {
+@Mixin(AbstractZombieModel.class)
+public abstract class AbstractZombieModelMixin<T extends Monster> extends HumanoidModel<T> {
+    protected AbstractZombieModelMixin(ModelPart root) {
+        super(root);
+    }
+
     @Inject(
-            method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V",
+            method = "setupAnim(Lnet/minecraft/world/entity/monster/Monster;FFFFF)V",
             at = @At("TAIL")
     )
     private void mtacz$reapplyGunPose(
@@ -27,11 +30,6 @@ public abstract class HumanoidModelMixin<T extends LivingEntity> extends Ageable
             float headPitch,
             CallbackInfo ci
     ) {
-        if ((Object) this instanceof AbstractZombieModel<?>) {
-            return;
-        }
-        if(entity instanceof Zombie) return;
-
         MobGunAnimationApplier.applyIfNeeded((IGunPoseModelAccess) this, entity, ageInTicks);
     }
 }
