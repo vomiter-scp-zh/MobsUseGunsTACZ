@@ -7,8 +7,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 
 public final class MobGunPoseHelper {
-    private MobGunPoseHelper() {
-    }
 
     public static void applyAimingPose(IGunPoseModelAccess model) {
         float headX = model.mtacz$getHead().xRot;
