@@ -8,18 +8,21 @@ import net.minecraft.world.entity.LivingEntity;
 
 public final class MobGunPoseHelper {
 
-    public static void applyAimingPose(IGunPoseModelAccess model) {
+    public static void applyAimingPose(IGunPoseModelAccess model, float pitchOffset, float yawOffset) {
         float headX = model.mtacz$getHead().xRot;
+        float headY = model.mtacz$getHead().yRot;
+        float pitchOffsetRAD = pitchOffset * Mth.DEG_TO_RAD;
+        float yawOffsetRAD = yawOffset * Mth.DEG_TO_RAD;
 
         model.mtacz$getBody().yRot = -0.5F;
 
-        model.mtacz$getRightArm().xRot = -1.5F + headX;
-        model.mtacz$getRightArm().yRot = 0F;
+        model.mtacz$getRightArm().xRot = -1.5F + headX + pitchOffsetRAD;
+        model.mtacz$getRightArm().yRot = 0F + headY + yawOffsetRAD;
         model.mtacz$getRightArm().zRot = 0.05F;
         model.mtacz$getRightArm().z = -3;
 
-        model.mtacz$getLeftArm().xRot = -1.4F + headX;
-        model.mtacz$getLeftArm().yRot = 1F;
+        model.mtacz$getLeftArm().xRot = -1.4F + headX + pitchOffsetRAD;
+        model.mtacz$getLeftArm().yRot = 1F + headY + yawOffsetRAD;
         model.mtacz$getLeftArm().zRot = -0.12F;
     }
 
