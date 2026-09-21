@@ -66,9 +66,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
                 && state.mtacz$getMaxAimOffset() <= offsetTolerance
                 && target != null
                 && target.isAlive()
-                && IGun.mainHandHoldGun(shooter)
-                && shooter.distanceToSqr(target)
-                <= attackRange * attackRange * 2.25D;
+                && IGun.mainHandHoldGun(shooter);
     }
 
     @Override
@@ -122,8 +120,11 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         double attackRangeSqr = attackRange * attackRange;
 
         // 太遠就靠近，夠近就停
-        if (distSqr > attackRangeSqr * 0.8D) {
+        if (distSqr > attackRangeSqr * 2.25D){
             shooter.getNavigation().moveTo(target, moveSpeed);
+        }
+        else if (distSqr > attackRangeSqr * 0.8D) {
+            shooter.getNavigation().moveTo(target, moveSpeed / 2);
         } else {
             shooter.getNavigation().stop();
         }

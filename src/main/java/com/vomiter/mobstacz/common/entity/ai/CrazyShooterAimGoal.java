@@ -41,6 +41,7 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
 
     @Override
     public void stop() {
+
     }
 
     @Override
@@ -73,7 +74,7 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
 
         // 太遠就靠近，夠近就停
         if (distSqr > attackRangeSqr * 0.8D) {
-            shooter.getNavigation().moveTo(target, 0);
+            shooter.getNavigation().moveTo(target, 0.5);
         } else {
             shooter.getNavigation().stop();
         }
