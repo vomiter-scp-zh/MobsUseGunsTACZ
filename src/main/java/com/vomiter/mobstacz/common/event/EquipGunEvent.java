@@ -100,7 +100,7 @@ public class EquipGunEvent {
         CrazyShooterShootingGoal shootingGoal =
                 new CrazyShooterShootingGoal(
                         mob,
-                        0.5D,
+                        1D,
                         8.0F,
                         16,
                         32,
@@ -110,7 +110,7 @@ public class EquipGunEvent {
 
         CrazyShooterReloadGoal reloadGoal = new CrazyShooterReloadGoal(mob);
 
-        CrazyShooterAimGoal aimGoal = new CrazyShooterAimGoal(mob, 0.01F, 8.0F);
+        CrazyShooterAimGoal aimGoal = new CrazyShooterAimGoal(mob, 1,0.01F, 8.0F);
 
         ArrayList<GoalMutateUtils.Replacement> replacements = new ArrayList<>();
 

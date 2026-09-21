@@ -10,13 +10,17 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
     private final Mob shooter;
     private final float minOffsetTolerance;
     private final float attackRange;
+    private final double moveSpeed;
+
 
     // 射擊後準心飄移
     public CrazyShooterAimGoal(
             Mob shooter,
+            double moveSpeed,
             float minOffsetTolerance, float attackRange
     ) {
         this.shooter = shooter;
+        this.moveSpeed = moveSpeed;
         this.minOffsetTolerance = minOffsetTolerance;
         this.attackRange = attackRange;
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK));
@@ -73,8 +77,11 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
         double attackRangeSqr = attackRange * attackRange;
 
         // 太遠就靠近，夠近就停
-        if (distSqr > attackRangeSqr * 0.8D) {
-            shooter.getNavigation().moveTo(target, 0.5);
+        if (distSqr > attackRangeSqr * 2.25D){
+            shooter.getNavigation().moveTo(target, moveSpeed);
+        }
+        else if (distSqr > attackRangeSqr * 0.8D) {
+            shooter.getNavigation().moveTo(target, moveSpeed / 2);
         } else {
             shooter.getNavigation().stop();
         }
