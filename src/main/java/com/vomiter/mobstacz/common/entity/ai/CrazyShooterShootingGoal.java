@@ -3,7 +3,10 @@ package com.vomiter.mobstacz.common.entity.ai;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
+import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.common.entity.MobGunUtils;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -139,8 +142,8 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
 
     private void tryOperateGun(float finalPitch, float finalYaw) {
         IGunOperator gunOperator = IGunOperator.fromLivingEntity(shooter);
-        ShootResult result = gunOperator.shoot(() -> finalPitch, () -> finalYaw);
         IMobGunState shooterState = (IMobGunState) shooter;
+        ShootResult result = gunOperator.shoot(() -> finalPitch + shooterState.mtacz$getAimPitchOffset(), () -> finalYaw + shooterState.mtacz$getAimYawOffset());
         handleShootResult(result, gunOperator, shooterState);
     }
 
@@ -174,6 +177,9 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
                         minAttackInterval,
                         maxAttackInterval
                 );
+                if(Config.MOB_GLOWS_AFTER_SHOOTING){
+                    shooter.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0));
+                }
             }
 
             case NOT_DRAW -> {
