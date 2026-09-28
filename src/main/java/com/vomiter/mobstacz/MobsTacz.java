@@ -2,6 +2,7 @@ package com.vomiter.mobstacz;
 
 import com.mojang.logging.LogUtils;
 import com.tacz.guns.api.item.IGun;
+import com.vomiter.mobstacz.client.animation.ClientEventHandler;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import com.vomiter.mobstacz.common.event.EventHandler;
 import com.vomiter.mobstacz.common.registry.ModRegistries;
@@ -12,6 +13,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.slf4j.Logger;
 
 @Mod(MobsTacz.MOD_ID)
@@ -36,6 +38,9 @@ public class MobsTacz
         ModRegistries.register(modBus);
         context.registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         modBus.addListener(ModCapabilities::onRegisterCapabilities);
+        if (FMLEnvironment.dist.isClient()){
+            ClientEventHandler.init();
+        }
     }
 
     private void commonSetup(final FMLCommonSetupEvent event)
