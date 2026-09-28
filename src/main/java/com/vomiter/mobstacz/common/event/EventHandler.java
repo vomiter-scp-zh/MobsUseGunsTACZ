@@ -16,6 +16,7 @@ public class EventHandler {
         bus.addListener(MobTaczDataConfigReloadListener::onAddReloadListeners);
         bus.addListener(MobSpawnEvent::onFinalizeSpawn);
         bus.addGenericListener(Entity.class, MobAmmoCapabilityEvents::onAttachCapabilities);
+        bus.addListener(DeathEvent::onLivingDeath);
 
     }
 
