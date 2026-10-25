@@ -2,11 +2,13 @@ package com.vomiter.mobstacz.data;
 
 import com.vomiter.mobstacz.Helpers;
 import com.vomiter.mobstacz.MobsTacz;
+import com.vomiter.mobstacz.common.registry.ModEntityTypeTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -32,6 +34,7 @@ public class ModTagProviders {
         var itemTags = new ItemTags(blockTags);
         generator.addProvider(event.includeServer(), blockTags);
         generator.addProvider(event.includeServer(), itemTags);
+        generator.addProvider(event.includeServer(), new EntityTags());
 
     }
 
@@ -45,6 +48,17 @@ public class ModTagProviders {
         @Override
         protected void addTags(HolderLookup.@NotNull Provider lookupProvider) {
 
+        }
+    }
+
+    class EntityTags extends EntityTypeTagsProvider {
+        public EntityTags() {
+            super(output, lookupProvider, MobsTacz.MOD_ID, helper);
+        }
+
+        @Override
+        protected void addTags(HolderLookup.@NotNull Provider lookupProvider) {
+            tag(ModEntityTypeTags.GUN_EQUIP_BLACKLIST);
         }
     }
 

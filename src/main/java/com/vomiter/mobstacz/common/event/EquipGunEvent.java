@@ -3,6 +3,7 @@ package com.vomiter.mobstacz.common.event;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.IGun;
 import com.vomiter.mobstacz.common.entity.MobGunUtils;
+import com.vomiter.mobstacz.common.registry.ModEntityTypeTags;
 import com.vomiter.mobstacz.data.mtacz.MobTaczConfigManager;
 import com.vomiter.mobstacz.common.entity.ai.*;
 import com.vomiter.neurolib.common.entity.generic.GoalMutateUtils;
@@ -19,6 +20,10 @@ import java.util.Objects;
 public class EquipGunEvent {
     static void onMobEquipGun(LivingEquipmentChangeEvent event) {
         if (!(event.getEntity() instanceof Mob mob)) {
+            return;
+        }
+
+        if (mob.getType().is(ModEntityTypeTags.GUN_EQUIP_BLACKLIST)) {
             return;
         }
 
