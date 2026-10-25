@@ -12,10 +12,12 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     private final Mob shooter;
     private final double moveSpeed;
+    private final ShooterMovement movement;
     private final float attackRange;
     private final int minAttackInterval;
     private final int maxAttackInterval;
@@ -36,6 +38,15 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
             int loseSightTolerance,
             float offsetTolerance
     ) {
+        this(shooter, moveSpeed, attackRange, minAttackInterval, maxAttackInterval,
+                loseSightTolerance, offsetTolerance, ShooterMovement.APPROACH);
+    }
+
+    public CrazyShooterShootingGoal(Mob shooter, double moveSpeed, float attackRange,
+                                    int minAttackInterval, int maxAttackInterval,
+                                    int loseSightTolerance, float offsetTolerance,
+                                    ShooterMovement movement) {
+        this.movement = Objects.requireNonNull(movement);
         this.shooter = shooter;
         this.moveSpeed = moveSpeed;
         this.attackRange = attackRange;
@@ -79,7 +90,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     @Override
     public void stop() {
         //MobsTacz.LOGGER.info("[MTACZ] fire stop");
-        shooter.getNavigation().stop();
+        movement.stop(shooter);
         nextAttackTick = 0;
         unseenTicks = 0;
     }
@@ -116,18 +127,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         setRot(finalYaw, finalPitch);
         shooter.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
-        double distSqr = shooter.distanceToSqr(target);
-        double attackRangeSqr = attackRange * attackRange;
-
-        // 太遠就靠近，夠近就停
-        if (distSqr > attackRangeSqr * 2.25D){
-            shooter.getNavigation().moveTo(target, moveSpeed);
-        }
-        else if (distSqr > attackRangeSqr * 0.8D) {
-            shooter.getNavigation().moveTo(target, moveSpeed / 2);
-        } else {
-            shooter.getNavigation().stop();
-        }
+        movement.tick(shooter, target, canSee, moveSpeed, attackRange);
 
         if (!canSee) {
             return;

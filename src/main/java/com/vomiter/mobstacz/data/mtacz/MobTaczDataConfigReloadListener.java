@@ -51,8 +51,12 @@ public class MobTaczDataConfigReloadListener extends SimpleJsonResourceReloadLis
                 //int checkInterval = GsonHelper.getAsInt(obj, "check_continue_to_use_interval", 30);
 
                 MobTaczSpawnConfig spawnConfig = parseSpawnConfig(obj);
+                MobTaczMovementConfig movementConfig = obj.has("movement")
+                        ? MobTaczMovementConfig.parse(GsonHelper.getAsJsonObject(obj, "movement"))
+                        : MobTaczMovementConfig.DEFAULT;
                 //MobTaczConfigManager.put(fileId, config);
                 MobTaczConfigManager.put(fileId, spawnConfig);
+                MobTaczConfigManager.putMovement(fileId, movementConfig);
 
 
             } catch (Exception e) {
@@ -75,11 +79,12 @@ public class MobTaczDataConfigReloadListener extends SimpleJsonResourceReloadLis
                 entries.add(parseSpawnEntry(element.getAsJsonObject()));
             }
 
-            if (!entries.isEmpty()) {
-                return new MobTaczSpawnConfig(List.copyOf(entries));
-            }
+            return new MobTaczSpawnConfig(List.copyOf(entries));
         }
 
+        if (!obj.has("gunId")) {
+            return MobTaczSpawnConfig.DEFAULT;
+        }
         // fallback: legacy single-entry fields
         return new MobTaczSpawnConfig(List.of(parseSpawnEntry(obj)));
     }

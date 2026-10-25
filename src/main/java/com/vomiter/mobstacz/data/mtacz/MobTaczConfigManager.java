@@ -10,12 +10,15 @@ public final class MobTaczConfigManager {
     //private static final Map<ResourceLocation, MobShieldConfig> CONFIGS = new ConcurrentHashMap<>();
     private static final Map<ResourceLocation, MobTaczSpawnConfig> SPAWN_CONFIGS = new ConcurrentHashMap<>();
 
+    private static final Map<ResourceLocation, MobTaczMovementConfig> MOVEMENT_CONFIGS = new ConcurrentHashMap<>();
+
     private MobTaczConfigManager() {
     }
 
     public static void clear() {
         //CONFIGS.clear();
         SPAWN_CONFIGS.clear();
+        MOVEMENT_CONFIGS.clear();
     }
 
     /*
@@ -37,6 +40,14 @@ public final class MobTaczConfigManager {
         SPAWN_CONFIGS.put(entityId, config);
     }
 
+
+    public static void putMovement(ResourceLocation entityId, MobTaczMovementConfig config) {
+        MOVEMENT_CONFIGS.put(entityId, config);
+    }
+
+    public static MobTaczMovementConfig getMovement(EntityType<?> type) {
+        return MOVEMENT_CONFIGS.getOrDefault(EntityType.getKey(type), MobTaczMovementConfig.DEFAULT);
+    }
 
     public static MobTaczSpawnConfig getSpawn(ResourceLocation entityId) {
         return SPAWN_CONFIGS.getOrDefault(entityId, MobTaczSpawnConfig.DEFAULT);

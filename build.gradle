@@ -52,23 +52,6 @@ dependencies {
     implementation fg.deobf("curse.maven:neurolib-1484243:7897734")
 }
 
-def devRuntimeProject(String path) {
-    evaluationDependsOn(path)
-    dependencies {
-        runtimeOnly files(
-                project(path)
-                        .tasks.named("devJar")
-                        .flatMap { it.archiveFile }
-        )
-        compileOnly project(path)
-    }
-    tasks.matching { it.name in ["runClient", "runServer", "runGameTestServer"] }.configureEach {
-        dependsOn("${path}:devJar")
-    }
-}
-//devRuntimeProject(":neurolib")
-
-//devRuntime.project(":common", true)
 
 /*
 /summon piglin ~ ~ ~ {IsImmuneToZombification:1,HandItems:[{id:crossbow,Count:1},{}]}

@@ -3,6 +3,7 @@ package com.vomiter.mobstacz.common.event;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.item.IGun;
 import com.vomiter.mobstacz.common.entity.MobGunUtils;
+import com.vomiter.mobstacz.data.mtacz.MobTaczConfigManager;
 import com.vomiter.mobstacz.common.entity.ai.*;
 import com.vomiter.neurolib.common.entity.generic.GoalMutateUtils;
 import net.minecraft.resources.ResourceLocation;
@@ -97,6 +98,8 @@ public class EquipGunEvent {
             return;
         }
 
+        ShooterMovement movement = new StrafingShooterMovement(
+                () -> MobTaczConfigManager.getMovement(mob.getType()));
         CrazyShooterShootingGoal shootingGoal =
                 new CrazyShooterShootingGoal(
                         mob,
@@ -105,12 +108,13 @@ public class EquipGunEvent {
                         16,
                         32,
                         200,
-                        4.0F
+                        4.0F,
+                        movement
                 );
 
         CrazyShooterReloadGoal reloadGoal = new CrazyShooterReloadGoal(mob);
 
-        CrazyShooterAimGoal aimGoal = new CrazyShooterAimGoal(mob, 1,0.01F, 8.0F);
+        CrazyShooterAimGoal aimGoal = new CrazyShooterAimGoal(mob, 1, 0.01F, 8.0F, movement);
 
         ArrayList<GoalMutateUtils.Replacement> replacements = new ArrayList<>();
 

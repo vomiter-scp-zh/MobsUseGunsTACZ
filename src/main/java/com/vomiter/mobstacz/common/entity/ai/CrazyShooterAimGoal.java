@@ -5,12 +5,14 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 import java.util.EnumSet;
+import java.util.Objects;
 
 public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
     private final Mob shooter;
     private final float minOffsetTolerance;
     private final float attackRange;
     private final double moveSpeed;
+    private final ShooterMovement movement;
 
 
     // 射擊後準心飄移
@@ -19,6 +21,12 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
             double moveSpeed,
             float minOffsetTolerance, float attackRange
     ) {
+        this(shooter, moveSpeed, minOffsetTolerance, attackRange, ShooterMovement.APPROACH);
+    }
+
+    public CrazyShooterAimGoal(Mob shooter, double moveSpeed, float minOffsetTolerance,
+                               float attackRange, ShooterMovement movement) {
+        this.movement = Objects.requireNonNull(movement);
         this.shooter = shooter;
         this.moveSpeed = moveSpeed;
         this.minOffsetTolerance = minOffsetTolerance;
@@ -30,7 +38,9 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
     public boolean canUse() {
         IMobGunState mobGunState = (IMobGunState) shooter;
         boolean isRanged = mobGunState.mtacz$getMode().equals(GunMode.RANGED);
-        return isRanged && mobGunState.mtacz$getMaxAimOffset() > minOffsetTolerance;
+        LivingEntity target = shooter.getTarget();
+        return isRanged && target != null && target.isAlive()
+                && mobGunState.mtacz$getMaxAimOffset() > minOffsetTolerance;
     }
 
     @Override
@@ -45,7 +55,7 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
 
     @Override
     public void stop() {
-
+        movement.stop(shooter);
     }
 
     @Override
@@ -73,18 +83,7 @@ public class CrazyShooterAimGoal extends Goal implements IShootingGoal {
         setRot(finalYaw, finalPitch);
         shooter.getLookControl().setLookAt(target, 30.0F, 30.0F);
 
-        double distSqr = shooter.distanceToSqr(target);
-        double attackRangeSqr = attackRange * attackRange;
-
-        // 太遠就靠近，夠近就停
-        if (distSqr > attackRangeSqr * 2.25D){
-            shooter.getNavigation().moveTo(target, moveSpeed);
-        }
-        else if (distSqr > attackRangeSqr * 0.8D) {
-            shooter.getNavigation().moveTo(target, moveSpeed / 2);
-        } else {
-            shooter.getNavigation().stop();
-        }
+        movement.tick(shooter, target, canSee, moveSpeed, attackRange);
 
         if (!canSee) {
             return;
