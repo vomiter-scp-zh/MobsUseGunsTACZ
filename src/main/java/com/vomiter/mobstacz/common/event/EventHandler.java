@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.EventPriority;
 
 public class EventHandler {
     public static void init(){
@@ -15,6 +16,7 @@ public class EventHandler {
         bus.addListener(EquipGunEvent::onMobEquipGun);
         bus.addListener(MobTaczDataConfigReloadListener::onAddReloadListeners);
         bus.addListener(MobSpawnEvent::onFinalizeSpawn);
+        bus.addListener(EventPriority.HIGHEST, MobSpawnEvent::onEntityJoinLevel);
         bus.addGenericListener(Entity.class, MobAmmoCapabilityEvents::onAttachCapabilities);
         bus.addListener(DeathEvent::onLivingDeath);
 

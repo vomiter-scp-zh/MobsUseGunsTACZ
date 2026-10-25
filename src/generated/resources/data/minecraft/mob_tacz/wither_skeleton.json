@@ -1,0 +1,16 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:fn_fal",
+      "min_difficulty": 3.5,
+      "weight": 80.0
+    },
+    {
+      "gunId": "tacz:db_long",
+      "min_difficulty": 4.5,
+      "weight": 20.0
+    }
+  ],
+  "spawn_chance": 0.3
+}

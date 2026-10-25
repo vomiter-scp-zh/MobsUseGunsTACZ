@@ -4,22 +4,32 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Predicate;
 
-public record MobTaczSpawnConfig(List<MobTaczSpawnEntry> guns, double spawnChance) {
+public record MobTaczSpawnConfig(List<MobTaczSpawnEntry> guns, double spawnChance,
+                                 boolean allowBabies, Set<ResourceLocation> preservedItems) {
     public static final MobTaczSpawnConfig DEFAULT = new MobTaczSpawnConfig(List.of());
 
     public MobTaczSpawnConfig(List<MobTaczSpawnEntry> guns) {
         this(guns, 1.0D);
     }
 
+    public MobTaczSpawnConfig(List<MobTaczSpawnEntry> guns, double spawnChance) {
+        this(guns, spawnChance, true, Set.of());
+    }
+
     public MobTaczSpawnConfig {
         guns = List.copyOf(guns);
+        preservedItems = Set.copyOf(preservedItems);
         if (!Double.isFinite(spawnChance) || spawnChance < 0 || spawnChance > 1) {
             throw new IllegalArgumentException("spawn_chance must be finite and within [0, 1]");
         }
@@ -105,7 +115,42 @@ public record MobTaczSpawnConfig(List<MobTaczSpawnEntry> guns, double spawnChanc
         } else if (obj.has("gunId")) {
             entries.add(parseEntry(obj));
         }
-        return new MobTaczSpawnConfig(entries, GsonHelper.getAsDouble(obj, "spawn_chance", 1.0D));
+        Set<ResourceLocation> preservedItems = new HashSet<>();
+        if (obj.has("preserve_items")) {
+            for (JsonElement element : GsonHelper.getAsJsonArray(obj, "preserve_items")) {
+                ResourceLocation id = ResourceLocation.tryParse(GsonHelper.convertToString(element, "preserve_items entry"));
+                if (id == null) throw new IllegalArgumentException("Invalid item ID in preserve_items");
+                preservedItems.add(id);
+            }
+        }
+        return new MobTaczSpawnConfig(entries, GsonHelper.getAsDouble(obj, "spawn_chance", 1.0D),
+                GsonHelper.getAsBoolean(obj, "allow_babies", true), preservedItems);
+    }
+
+    public boolean preserves(ItemStack stack) {
+        return !stack.isEmpty() && preservedItems.contains(BuiltInRegistries.ITEM.getKey(stack.getItem()));
+    }
+
+    public JsonObject toJson() {
+        JsonObject json = new JsonObject();
+        json.addProperty("spawn_chance", spawnChance);
+        json.addProperty("allow_babies", allowBabies);
+        if (!preservedItems.isEmpty()) {
+            JsonArray items = new JsonArray();
+            preservedItems.stream().sorted().forEach(id -> items.add(id.toString()));
+            json.add("preserve_items", items);
+        }
+        JsonArray entries = new JsonArray();
+        for (MobTaczSpawnEntry entry : guns) {
+            JsonObject gun = new JsonObject();
+            gun.addProperty("gunId", entry.gunId().toString());
+            if (entry.weight() != null) gun.addProperty("weight", entry.weight());
+            else gun.addProperty("chance", entry.chance());
+            gun.addProperty("min_difficulty", entry.minDifficulty());
+            entries.add(gun);
+        }
+        json.add("guns", entries);
+        return json;
     }
 
     private static MobTaczSpawnEntry parseEntry(JsonObject obj) {

@@ -1,0 +1,26 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:glock_17",
+      "min_difficulty": 1.5,
+      "weight": 50.0
+    },
+    {
+      "gunId": "tacz:cz75",
+      "min_difficulty": 1.5,
+      "weight": 25.0
+    },
+    {
+      "gunId": "tacz:uzi",
+      "min_difficulty": 1.5,
+      "weight": 20.0
+    },
+    {
+      "gunId": "tacz:m1911",
+      "min_difficulty": 2.25,
+      "weight": 5.0
+    }
+  ],
+  "spawn_chance": 0.25
+}

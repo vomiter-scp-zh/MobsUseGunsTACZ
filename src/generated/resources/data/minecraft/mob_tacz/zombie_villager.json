@@ -1,0 +1,16 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:glock_17",
+      "min_difficulty": 1.5,
+      "weight": 80.0
+    },
+    {
+      "gunId": "tacz:cz75",
+      "min_difficulty": 1.5,
+      "weight": 20.0
+    }
+  ],
+  "spawn_chance": 0.05
+}

@@ -1,0 +1,21 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:deagle_golden",
+      "min_difficulty": 1.5,
+      "weight": 45.0
+    },
+    {
+      "gunId": "tacz:ump45",
+      "min_difficulty": 2.25,
+      "weight": 35.0
+    },
+    {
+      "gunId": "tacz:ak47",
+      "min_difficulty": 3.0,
+      "weight": 20.0
+    }
+  ],
+  "spawn_chance": 0.3
+}

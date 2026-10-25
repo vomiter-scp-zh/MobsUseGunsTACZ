@@ -28,6 +28,9 @@ minecraft {
     copyIdeResources = true
 }
 
+sourceSets.main.resources.srcDir 'src/generated/resources'
+tasks.named('processResources').configure { exclude '.cache/**' }
+
 apply from: 'gradle/runs.gradle'
 apply from: 'gradle/publishing-local.gradle'
 apply from: 'gradle/mixin.gradle'

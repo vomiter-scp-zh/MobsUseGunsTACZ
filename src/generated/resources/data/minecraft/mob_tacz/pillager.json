@@ -1,0 +1,26 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:hk_mp5a5",
+      "min_difficulty": 2.25,
+      "weight": 30.0
+    },
+    {
+      "gunId": "tacz:m4a1",
+      "min_difficulty": 3.0,
+      "weight": 35.0
+    },
+    {
+      "gunId": "tacz:ak47",
+      "min_difficulty": 3.0,
+      "weight": 25.0
+    },
+    {
+      "gunId": "tacz:m16a4",
+      "min_difficulty": 4.5,
+      "weight": 10.0
+    }
+  ],
+  "spawn_chance": 0.35
+}

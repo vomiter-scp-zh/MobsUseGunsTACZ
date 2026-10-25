@@ -1,0 +1,26 @@
+{
+  "allow_babies": false,
+  "guns": [
+    {
+      "gunId": "tacz:hk_mp5a5",
+      "min_difficulty": 2.25,
+      "weight": 40.0
+    },
+    {
+      "gunId": "tacz:sks_tactical",
+      "min_difficulty": 2.25,
+      "weight": 35.0
+    },
+    {
+      "gunId": "tacz:m1911",
+      "min_difficulty": 2.25,
+      "weight": 20.0
+    },
+    {
+      "gunId": "tacz:m700",
+      "min_difficulty": 4.5,
+      "weight": 5.0
+    }
+  ],
+  "spawn_chance": 0.25
+}

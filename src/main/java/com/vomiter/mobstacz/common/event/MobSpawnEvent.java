@@ -3,12 +3,14 @@ package com.vomiter.mobstacz.common.event;
 import com.tacz.guns.api.TimelessAPI;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.vomiter.mobstacz.MobsTacz;
+import com.vomiter.mobstacz.common.entity.spawn.SpawnGunEquipmentAccess;
 import com.vomiter.mobstacz.data.mtacz.MobTaczConfigManager;
 import com.vomiter.mobstacz.data.mtacz.MobTaczSpawnConfig;
 import com.vomiter.mobstacz.data.mtacz.MobTaczSpawnEntry;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 
 public class MobSpawnEvent {
     public static void onFinalizeSpawn(net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn event) {
@@ -22,6 +24,7 @@ public class MobSpawnEvent {
 
         MobTaczSpawnConfig config = MobTaczConfigManager.getSpawn(mob.getType());
         if (config == null || !config.hasEntries()) return;
+        if (!config.allowBabies() && mob.isBaby()) return;
 
         int startIndex = 0;
         while (startIndex < config.guns().size()) {
@@ -31,7 +34,9 @@ public class MobSpawnEvent {
                 return false;
             }, startIndex);
             if (entry == null) return;
-            startIndex += config.guns().subList(startIndex, config.guns().size()).indexOf(entry) + 1;
+            while (startIndex < config.guns().size()) {
+                if (config.guns().get(startIndex++) == entry) break;
+            }
             try {
                 var gunIndexOptional = TimelessAPI.getCommonGunIndex(entry.gunId());
 
@@ -56,7 +61,7 @@ public class MobSpawnEvent {
                 }
 
                 mob.setItemSlot(EquipmentSlot.MAINHAND, gun);
-                mob.setDropChance(EquipmentSlot.MAINHAND, 0.085f);
+                ((SpawnGunEquipmentAccess) mob).mtacz$getSpawnGunEquipment().select(gun, config);
                 return;
 
             } catch (Exception e) {
@@ -65,5 +70,9 @@ public class MobSpawnEvent {
                 // Legacy configs used to continue checking later entries after a build exception.
             }
         }
+    }
+    public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide() || !(event.getEntity() instanceof Mob mob)) return;
+        ((SpawnGunEquipmentAccess) mob).mtacz$getSpawnGunEquipment().finish(mob);
     }
 }
