@@ -23,17 +23,21 @@ public class MobSpawnEvent {
         MobTaczSpawnConfig config = MobTaczConfigManager.getSpawn(mob.getType());
         if (config == null || !config.hasEntries()) return;
 
-        for (MobTaczSpawnEntry entry : config.guns()) {
-            if (entry == null) continue;
-            if (entry.gunId() == null) continue;
-            if (difficulty < entry.minDifficulty()) continue;
-            if (mob.getRandom().nextFloat() > entry.chance()) continue;
+        int startIndex = 0;
+        while (startIndex < config.guns().size()) {
+            MobTaczSpawnEntry entry = config.select(difficulty, mob.getRandom(), candidate -> {
+                if (TimelessAPI.getCommonGunIndex(candidate.gunId()).isPresent()) return true;
+                MobsTacz.LOGGER.warn("[MobsTacz] unknown TACZ gun id: {}", candidate.gunId());
+                return false;
+            }, startIndex);
+            if (entry == null) return;
+            startIndex += config.guns().subList(startIndex, config.guns().size()).indexOf(entry) + 1;
             try {
                 var gunIndexOptional = TimelessAPI.getCommonGunIndex(entry.gunId());
 
                 if (gunIndexOptional.isEmpty()) {
                     MobsTacz.LOGGER.warn("[MobsTacz] unknown TACZ gun id: {}", entry.gunId());
-                    continue;
+                    return;
                 }
 
                 var gunIndex = gunIndexOptional.get();
@@ -57,6 +61,8 @@ public class MobSpawnEvent {
 
             } catch (Exception e) {
                 MobsTacz.LOGGER.error("[MobsTacz] unable to build gun: {}", entry.gunId(), e);
+                if (config.isWeighted()) return;
+                // Legacy configs used to continue checking later entries after a build exception.
             }
         }
     }
