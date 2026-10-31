@@ -10,10 +10,11 @@ import com.vomiter.mobstacz.data.mtacz.MobTaczSpawnEntry;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 
 public class MobSpawnEvent {
-    public static void onFinalizeSpawn(net.minecraftforge.event.entity.living.MobSpawnEvent.FinalizeSpawn event) {
+    public static void onFinalizeSpawn(FinalizeSpawnEvent event) {
         Mob mob = event.getEntity();
         if (mob.level().isClientSide()) return;
         if (!mob.getMainHandItem().isEmpty()) return;
@@ -53,7 +54,7 @@ public class MobSpawnEvent {
                         .setAmmoCount(gunData.getAmmoAmount())
                         .setFireMode(gunData.getFireModeSet().get(0))
                         .setAmmoInBarrel(true)
-                        .build();
+                        .build(mob.registryAccess());
 
                 if (gun.isEmpty()) {
                     MobsTacz.LOGGER.warn("[MobsTacz] failed to build gun item from TACZ index: {}", entry.gunId());

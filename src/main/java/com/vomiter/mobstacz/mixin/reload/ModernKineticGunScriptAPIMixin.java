@@ -36,7 +36,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
             if (mob.level().isClientSide) {
             }
             
-            int backpackAvailable = mob.getCapability(ModCapabilities.MOB_AMMO).map(
+            int backpackAvailable = ModCapabilities.getMobAmmo(mob).map(
                     iMobAmmoHandler -> {
                         int found = 0;
                         for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
@@ -79,8 +79,7 @@ public abstract class ModernKineticGunScriptAPIMixin {
             return;
         }
 
-        boolean hasAmmo = mob
-                .getCapability(ModCapabilities.MOB_AMMO)
+        boolean hasAmmo = ModCapabilities.getMobAmmo(mob)
                 .map(ammoInventory -> {
                     for (int slot = 0; slot < ammoInventory.getSlots(); slot++) {
                         ItemStack ammoStack = ammoInventory.getStackInSlot(slot);

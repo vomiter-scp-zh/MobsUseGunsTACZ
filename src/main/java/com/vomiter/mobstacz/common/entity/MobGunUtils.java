@@ -10,7 +10,7 @@ import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 public class MobGunUtils {
     public static boolean canReload(Mob shooter){
@@ -58,8 +58,7 @@ public class MobGunUtils {
                 .setCount(stackSize)
                 .build();
 
-        ItemStack remainder = mob
-                .getCapability(ModCapabilities.MOB_AMMO)
+        ItemStack remainder = ModCapabilities.getMobAmmo(mob)
                 .map(ammoInventory ->
                         ItemHandlerHelper.insertItemStacked(
                                 ammoInventory,

@@ -1,11 +1,10 @@
 package com.vomiter.mobstacz.common.registry;
 
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.registries.Registries;
 
 public class ModItems {
     static DeferredRegister<Item> ITEMS
-            = ModRegistries.createRegistry(ForgeRegistries.ITEMS);
+            = ModRegistries.createRegistry(Registries.ITEM);
 }

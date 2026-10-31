@@ -1,20 +1,22 @@
 package com.vomiter.mobstacz.common.entity.ammo;
 
+import com.vomiter.mobstacz.MobsTacz;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.util.LazyOptional;
+import net.minecraft.world.entity.Mob;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
+
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public final class ModCapabilities {
-    public static final Capability<IMobAmmoHandler> MOB_AMMO = CapabilityManager.get(new CapabilityToken<>() {});
+    public static final DeferredRegister<AttachmentType<?>> ATTACHMENTS =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, MobsTacz.MOD_ID);
+    public static final Supplier<AttachmentType<MobAmmoHandler>> MOB_AMMO = ATTACHMENTS.register(
+            "mob_ammo", () -> AttachmentType.serializable(() -> new MobAmmoHandler(4)).build());
 
-    public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
-        event.register(IMobAmmoHandler.class);
-    }
-
-    public static LazyOptional<IMobAmmoHandler> getMobAmmo(Entity entity) {
-        return entity.getCapability(MOB_AMMO);
+    public static Optional<IMobAmmoHandler> getMobAmmo(Entity entity) {
+        return entity instanceof Mob ? Optional.of(entity.getData(MOB_AMMO)) : Optional.empty();
     }
 }

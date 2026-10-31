@@ -7,7 +7,7 @@ import com.vomiter.neurolib.common.entity.gather.MobMoveToDroppedItemGoal;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> {
 
@@ -78,8 +78,7 @@ public class ShooterGetAmmoGoal extends MobMoveToDroppedItemGoal<PathfinderMob> 
         ItemStack original = target.getItem();
         int originalCount = original.getCount();
 
-        ItemStack remainder = mob
-                .getCapability(ModCapabilities.MOB_AMMO)
+        ItemStack remainder = ModCapabilities.getMobAmmo(mob)
                 .map(ammoInventory ->
                         ItemHandlerHelper.insertItemStacked(
                                 ammoInventory,

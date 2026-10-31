@@ -1,17 +1,17 @@
 package com.vomiter.mobstacz;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
 
-@Mod.EventBusSubscriber(modid = MobsTacz.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = MobsTacz.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class Config {
 
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.DoubleValue MOB_BULLET_DAMAGE_MULTIPLIER_SPEC;
-    private static final ForgeConfigSpec.BooleanValue MOB_GLOWS_AFTER_SHOOTING_SPEC;
+    private static final ModConfigSpec.DoubleValue MOB_BULLET_DAMAGE_MULTIPLIER_SPEC;
+    private static final ModConfigSpec.BooleanValue MOB_GLOWS_AFTER_SHOOTING_SPEC;
 
     public static double MOB_BULLET_DAMAGE_MULTIPLIER = 0.5D;
     public static boolean MOB_GLOWS_AFTER_SHOOTING = false;
@@ -30,7 +30,7 @@ public class Config {
         BUILDER.pop();
     }
 
-    public static final ForgeConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {

@@ -1,6 +1,6 @@
 package com.vomiter.mobstacz.common.entity.ammo;
 
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 /**
  * MobTACZ 專用的 mob 備用彈藥 inventory。

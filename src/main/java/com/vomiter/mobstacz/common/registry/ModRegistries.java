@@ -2,20 +2,17 @@ package com.vomiter.mobstacz.common.registry;
 
 import com.vomiter.mobstacz.MobsTacz;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraft.core.Registry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ModRegistries {
     static List<DeferredRegister<?>> REGISTRIES = new ArrayList<>();
-    public static <B> DeferredRegister<B> createRegistry(IForgeRegistry<B> b){
-        return DeferredRegister.create(b, MobsTacz.MOD_ID);
-    }
-    public static <B> DeferredRegister<B> createRegistry(ResourceKey b){
-        return DeferredRegister.create(b, MobsTacz.MOD_ID);
+    public static <B> DeferredRegister<B> createRegistry(ResourceKey<? extends Registry<B>> key){
+        return DeferredRegister.create(key, MobsTacz.MOD_ID);
     }
 
     static void add(DeferredRegister<?> r){

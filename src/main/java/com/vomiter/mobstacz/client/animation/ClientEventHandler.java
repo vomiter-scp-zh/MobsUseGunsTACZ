@@ -10,16 +10,15 @@ import com.tacz.guns.sound.SoundManager;
 import com.vomiter.mobstacz.MobsTacz;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.LogicalSide;
 
 public final class ClientEventHandler {
 
     public static void init(){
-        var bus = MinecraftForge.EVENT_BUS;
+        var bus = NeoForge.EVENT_BUS;
         bus.addListener(ClientEventHandler::onGunReload);
     }
 

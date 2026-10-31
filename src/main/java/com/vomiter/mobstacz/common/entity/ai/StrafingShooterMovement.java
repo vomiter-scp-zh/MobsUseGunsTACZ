@@ -5,7 +5,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
 
 import java.util.Objects;
@@ -84,8 +84,8 @@ public final class StrafingShooterMovement implements ShooterMovement {
         BlockPos pos = BlockPos.containing(shooter.position().add(step));
         NodeEvaluator evaluator = shooter.getNavigation().getNodeEvaluator();
         return evaluator != null
-                && evaluator.getBlockPathType(shooter.level(), pos.getX(), pos.getY(), pos.getZ())
-                == BlockPathTypes.WALKABLE
+                && evaluator.getPathType(shooter, pos)
+                == PathType.WALKABLE
                 && shooter.level().noCollision(shooter, shooter.getBoundingBox().move(step));
     }
 

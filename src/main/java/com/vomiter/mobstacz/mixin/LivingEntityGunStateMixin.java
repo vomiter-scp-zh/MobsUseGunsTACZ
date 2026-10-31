@@ -5,10 +5,8 @@ import com.vomiter.mobstacz.common.entity.ai.IMobGunState;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -78,25 +76,22 @@ public class LivingEntityGunStateMixin implements IMobGunState {
         }
     }
 
-    @Inject(method = "<init>", at = @At("TAIL"))
-    private void mtacz$defineData(EntityType p_20966_, Level p_20967_, CallbackInfo ci){
-        if ((Object)this instanceof Mob mob){
-            var entityData = mob.getEntityData();
-            entityData.define(MTACZ_AIM_PITCH_OFFSET, 0.0F);
-            entityData.define(MTACZ_AIM_YAW_OFFSET, 0.0F);
-            entityData.define(MTACZ_GUN_MODE, GunMode.MELEE.ordinal());
-        }
+    @Inject(method = "defineSynchedData", at = @At("TAIL"))
+    private void mtacz$defineData(SynchedEntityData.Builder builder, CallbackInfo ci){
+        builder.define(MTACZ_AIM_PITCH_OFFSET, 0.0F);
+        builder.define(MTACZ_AIM_YAW_OFFSET, 0.0F);
+        builder.define(MTACZ_GUN_MODE, GunMode.MELEE.ordinal());
     }
 
     @Unique
     private static final EntityDataAccessor<Float> MTACZ_AIM_PITCH_OFFSET =
-            SynchedEntityData.defineId(Mob.class, EntityDataSerializers.FLOAT);
+            SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
 
     @Unique
     private static final EntityDataAccessor<Float> MTACZ_AIM_YAW_OFFSET =
-            SynchedEntityData.defineId(Mob.class, EntityDataSerializers.FLOAT);
+            SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.FLOAT);
 
     @Unique
     private static final EntityDataAccessor<Integer> MTACZ_GUN_MODE =
-            SynchedEntityData.defineId(Mob.class, EntityDataSerializers.INT);
+            SynchedEntityData.defineId(LivingEntity.class, EntityDataSerializers.INT);
 }

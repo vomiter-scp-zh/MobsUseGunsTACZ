@@ -43,7 +43,7 @@ public abstract class AbstractGunMixin  implements IGun {
                 if (mob.level().isClientSide) {
                 }
 
-                int backpackAvailable = mob.getCapability(ModCapabilities.MOB_AMMO).map(
+                int backpackAvailable = ModCapabilities.getMobAmmo(mob).map(
                         iMobAmmoHandler -> {
                             int found = 0;
                             for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
@@ -83,7 +83,7 @@ public abstract class AbstractGunMixin  implements IGun {
                 if (mob.level().isClientSide) {
                 }
 
-                int backpackAvailable = mob.getCapability(ModCapabilities.MOB_AMMO).map(
+                int backpackAvailable = ModCapabilities.getMobAmmo(mob).map(
                         iMobAmmoHandler -> {
                             int found = 0;
                             for (int i = 0; i < iMobAmmoHandler.getSlots(); i++) {
