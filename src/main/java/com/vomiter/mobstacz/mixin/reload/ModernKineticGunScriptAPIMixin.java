@@ -4,6 +4,7 @@ import com.tacz.guns.api.item.IAmmo;
 import com.tacz.guns.api.item.IAmmoBox;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.item.ModernKineticGunScriptAPI;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -27,6 +28,13 @@ public abstract class ModernKineticGunScriptAPIMixin {
 
     @Shadow
     private LivingEntity shooter;
+
+    @Inject(method = "consumeAmmoFromPlayer", at = @At("HEAD"), cancellable = true)
+    private void mtacz$skipAmmoConsumption(int neededAmount, CallbackInfoReturnable<Integer> cir) {
+        if (shooter instanceof Mob mob && !MobGunUtils.shouldConsumeAmmo(mob)) {
+            cir.setReturnValue(neededAmount);
+        }
+    }
 
     @Inject(method = "consumeAmmoFromPlayer", at = @At("RETURN"), cancellable = true)
     private void mtacz$consumeAmmoFromPlayer(int neededAmount, CallbackInfoReturnable<Integer> cir){

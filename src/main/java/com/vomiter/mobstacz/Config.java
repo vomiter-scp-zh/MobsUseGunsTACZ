@@ -14,10 +14,12 @@ public class Config {
     private static final ModConfigSpec.BooleanValue MOB_GLOWS_AFTER_SHOOTING_SPEC;
 
     private static final ModConfigSpec.BooleanValue ADDITIONAL_SHOOT_COOLDOWN_SPEC;
+    private static final ModConfigSpec.BooleanValue CONSUME_AMMO_SPEC;
 
     public static double MOB_BULLET_DAMAGE_MULTIPLIER = 0.5D;
     public static boolean MOB_GLOWS_AFTER_SHOOTING = false;
     public static boolean ADDITIONAL_SHOOT_COOLDOWN = true;
+    public static boolean CONSUME_AMMO = true;
 
     static {
         BUILDER.push("Mob Shooting");
@@ -34,6 +36,10 @@ public class Config {
                 .comment("Default extra delay after a mob shoots. Individual overrides and entity type tags take priority.")
                 .define("additional_shoot_cooldown", true);
 
+        CONSUME_AMMO_SPEC = BUILDER
+                .comment("Default ammo consumption for mobs when shooting and reloading. Individual overrides and entity type tags take priority.")
+                .define("consume_ammo", true);
+
         BUILDER.pop();
     }
 
@@ -44,5 +50,6 @@ public class Config {
         MOB_BULLET_DAMAGE_MULTIPLIER = MOB_BULLET_DAMAGE_MULTIPLIER_SPEC.get();
         MOB_GLOWS_AFTER_SHOOTING = MOB_GLOWS_AFTER_SHOOTING_SPEC.get();
         ADDITIONAL_SHOOT_COOLDOWN = ADDITIONAL_SHOOT_COOLDOWN_SPEC.get();
+        CONSUME_AMMO = CONSUME_AMMO_SPEC.get();
     }
 }

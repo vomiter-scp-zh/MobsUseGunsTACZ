@@ -33,6 +33,21 @@ public class LivingEntityGunStateMixin implements IMobGunState {
     }
 
     @Unique
+    @Nullable
+    private Boolean mtacz$consumeAmmoOverride;
+
+    @Override
+    @Nullable
+    public Boolean mtacz$getConsumeAmmoOverride() {
+        return mtacz$consumeAmmoOverride;
+    }
+
+    @Override
+    public void mtacz$setConsumeAmmoOverride(@Nullable Boolean enabled) {
+        mtacz$consumeAmmoOverride = enabled;
+    }
+
+    @Unique
     private GunMode mode;
 
     @Unique

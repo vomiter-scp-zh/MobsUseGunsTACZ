@@ -61,6 +61,8 @@ public class ModTagProviders {
             tag(ModEntityTypeTags.GUN_EQUIP_BLACKLIST);
             tag(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_WHITELIST);
             tag(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_BLACKLIST);
+            tag(ModEntityTypeTags.CONSUME_AMMO_WHITELIST);
+            tag(ModEntityTypeTags.CONSUME_AMMO_BLACKLIST);
         }
     }
 

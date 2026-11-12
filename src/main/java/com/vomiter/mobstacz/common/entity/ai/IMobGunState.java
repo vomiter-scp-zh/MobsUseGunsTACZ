@@ -18,6 +18,13 @@ public interface IMobGunState {
     /** Set on the server thread. Pass null to clear the override. */
     void mtacz$setAdditionalShootCooldownOverride(@Nullable Boolean enabled);
 
+    /** Returns the runtime ammo consumption override, or null to inherit tags and config. */
+    @Nullable
+    Boolean mtacz$getConsumeAmmoOverride();
+
+    /** Set on the server thread. Pass null to restore tags and config. */
+    void mtacz$setConsumeAmmoOverride(@Nullable Boolean enabled);
+
     GunMode mtacz$getMode();
     void mtacz$setMode(GunMode mode);
     float mtacz$getAimYawOffset();
