@@ -5,7 +5,10 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.AmmoItemBuilder;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonAmmoIndex;
+import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.MobsTacz;
+import com.vomiter.mobstacz.common.entity.ai.IMobGunState;
+import com.vomiter.mobstacz.common.registry.ModEntityTypeTags;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
@@ -13,6 +16,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class MobGunUtils {
+    public static boolean shouldConsumeAmmo(Mob mob) {
+        Boolean override = ((IMobGunState) mob).mtacz$getConsumeAmmoOverride();
+        if (override != null) {
+            return override;
+        }
+        if (mob.getType().is(ModEntityTypeTags.CONSUME_AMMO_BLACKLIST)) {
+            return false;
+        }
+        return mob.getType().is(ModEntityTypeTags.CONSUME_AMMO_WHITELIST)
+                || Config.CONSUME_AMMO;
+    }
+
     public static boolean canReload(Mob shooter){
         return shooter.getMainHandItem().getItem() instanceof AbstractGunItem gunItem
                 && gunItem.canReload(shooter, shooter.getMainHandItem());

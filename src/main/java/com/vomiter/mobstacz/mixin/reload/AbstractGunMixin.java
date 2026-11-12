@@ -7,6 +7,7 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.gun.AbstractGunItem;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import com.tacz.guns.util.AttachmentDataUtils;
+import com.vomiter.mobstacz.common.entity.MobGunUtils;
 import com.vomiter.mobstacz.common.entity.ammo.ModCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,6 +35,9 @@ public abstract class AbstractGunMixin  implements IGun {
             if (currentAmmoCount >= maxAmmoCount) {
                 return;
             } else if (this.useInventoryAmmo(gunItem)) {
+                return;
+            } else if (!MobGunUtils.shouldConsumeAmmo(mob)) {
+                cir.setReturnValue(true);
                 return;
             } else if (gunIndex.getGunData().getReloadData().isInfinite()) {
                 return;

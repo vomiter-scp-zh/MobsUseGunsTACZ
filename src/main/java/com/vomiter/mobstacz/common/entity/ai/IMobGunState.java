@@ -5,11 +5,26 @@ import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.resource.index.CommonGunIndex;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
 
 public interface IMobGunState {
+    /** Returns the runtime override, or null to inherit the entity type and config settings. */
+    @Nullable
+    Boolean mtacz$getAdditionalShootCooldownOverride();
+
+    /** Set on the server thread. Pass null to clear the override. */
+    void mtacz$setAdditionalShootCooldownOverride(@Nullable Boolean enabled);
+
+    /** Returns the runtime ammo consumption override, or null to inherit tags and config. */
+    @Nullable
+    Boolean mtacz$getConsumeAmmoOverride();
+
+    /** Set on the server thread. Pass null to restore tags and config. */
+    void mtacz$setConsumeAmmoOverride(@Nullable Boolean enabled);
+
     GunMode mtacz$getMode();
     void mtacz$setMode(GunMode mode);
     float mtacz$getAimYawOffset();
@@ -23,7 +38,7 @@ public interface IMobGunState {
         mtacz$setAimYawOffset(mtacz$getAimYawOffset() + delta);
     }
     default void mtacz$clampPitchOffset(float a, float b){
-        mtacz$setAimPitchOffset(Mth.clamp(a, mtacz$getAimPitchOffset(), b));
+        mtacz$setAimPitchOffset(Mth.clamp(mtacz$getAimPitchOffset(), a, b));
     }
     default void mtacz$clampYawOffset(float a, float b){
         mtacz$setAimYawOffset(Mth.clamp(mtacz$getAimYawOffset(), a, b));

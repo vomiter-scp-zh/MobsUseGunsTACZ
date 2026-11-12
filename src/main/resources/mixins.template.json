@@ -8,7 +8,8 @@
     "LivingEntityGunStateMixin",
     "MobSpawnEquipmentMixin",
     "reload.ModernKineticGunScriptAPIMixin",
-    "reload.AbstractGunMixin"
+    "reload.AbstractGunMixin",
+    "reload.LivingEntityAmmoCheckMixin"
   ],
   "client": [
     "client.AbstractZombieModelMixin",

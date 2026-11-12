@@ -1,9 +1,11 @@
 package com.vomiter.mobstacz.common.event;
 
 import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.item.IGun;
 import com.tacz.guns.api.item.builder.GunItemBuilder;
 import com.vomiter.mobstacz.MobsTacz;
 import com.vomiter.mobstacz.common.entity.spawn.SpawnGunEquipmentAccess;
+import com.vomiter.mobstacz.common.registry.ModEntityTypeTags;
 import com.vomiter.mobstacz.data.mtacz.MobTaczConfigManager;
 import com.vomiter.mobstacz.data.mtacz.MobTaczSpawnConfig;
 import com.vomiter.mobstacz.data.mtacz.MobTaczSpawnEntry;
@@ -74,5 +76,9 @@ public class MobSpawnEvent {
     public static void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide() || !(event.getEntity() instanceof Mob mob)) return;
         ((SpawnGunEquipmentAccess) mob).mtacz$getSpawnGunEquipment().finish(mob);
+        if (!mob.getType().is(ModEntityTypeTags.GUN_EQUIP_BLACKLIST)
+                && IGun.mainHandHoldGun(mob)) {
+            mob.setLeftHanded(false);
+        }
     }
 }

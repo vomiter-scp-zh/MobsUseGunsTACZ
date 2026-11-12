@@ -40,6 +40,10 @@ public class EquipGunEvent {
         boolean hadGun = fromGun != null;
         boolean hasGun = toGun != null;
 
+        if (hasGun && !mob.level().isClientSide()) {
+            mob.setLeftHanded(false);
+        }
+
         // 非槍 → 非槍，與 MobTACZ 無關。
         if (!hadGun && !hasGun) {
             return;
