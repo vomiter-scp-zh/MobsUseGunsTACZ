@@ -1,5 +1,12 @@
 package com.vomiter.mobstacz.common.entity.ai;
 
+import com.tacz.guns.api.TimelessAPI;
+import com.tacz.guns.api.modifier.ParameterizedCachePair;
+import com.tacz.guns.resource.modifier.AttachmentCacheProperty;
+import com.tacz.guns.resource.modifier.custom.RecoilModifier;
+import com.tacz.guns.resource.pojo.data.gun.GunRecoil;
+import com.tacz.guns.resource.pojo.data.gun.GunRecoilKeyFrame;
+import net.minecraft.world.item.ItemStack;
 import com.tacz.guns.api.entity.IGunOperator;
 import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
@@ -184,12 +191,45 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     }
 
     private void applyRecoilDrift() {
-        // 向上飄 + 左右隨機
-        IMobGunState shooterState = (IMobGunState)(shooter);
-        shooterState.mtacz$addAimYawOffset((shooter.getRandom().nextFloat() - 0.5F) * 2.4F);
-        shooterState.mtacz$addAimPitchOffset(-2.0F - shooter.getRandom().nextFloat() * 1.5F);
+        ItemStack gunStack = shooter.getMainHandItem();
+        IGun gun = IGun.getIGunOrNull(gunStack);
+        if (gun == null) {
+            return;
+        }
+
+        GunRecoil recoil = TimelessAPI.getCommonGunIndex(gun.getGunId(gunStack))
+                .map(index -> index.getGunData().getRecoil())
+                .orElse(null);
+        if (recoil == null) {
+            return;
+        }
+
+        float pitchModifier = 1.0F;
+        float yawModifier = 1.0F;
+        AttachmentCacheProperty cache = IGunOperator.fromLivingEntity(shooter).getCacheProperty();
+        if (cache != null) {
+            ParameterizedCachePair<Float, Float> modifiers = cache.getCache(RecoilModifier.ID);
+            pitchModifier = (float) modifiers.left().eval(1.0F);
+            yawModifier = (float) modifiers.right().eval(1.0F);
+        }
+
+        // Use the first keyframe as a single kick; the aiming goal handles recovery.
+        // TACZ subtracts recoil angles from entity rotation, so preserve that sign here.
+        float pitchKick = sampleRecoilKick(recoil.getPitch()) * pitchModifier;
+        float yawKick = sampleRecoilKick(recoil.getYaw()) * yawModifier;
+        IMobGunState shooterState = (IMobGunState) shooter;
+        shooterState.mtacz$addAimPitchOffset(-pitchKick);
+        shooterState.mtacz$addAimYawOffset(-yawKick);
         shooterState.mtacz$clampYawOffset(-10f, 10f);
         shooterState.mtacz$clampPitchOffset(-12, 6);
+    }
+
+    private float sampleRecoilKick(GunRecoilKeyFrame[] frames) {
+        if (frames == null || frames.length == 0) {
+            return 0.0F;
+        }
+        float[] range = frames[0].getValue();
+        return range[0] + shooter.getRandom().nextFloat() * (range[1] - range[0]);
     }
 
     private int randomBetween(int min, int max) {

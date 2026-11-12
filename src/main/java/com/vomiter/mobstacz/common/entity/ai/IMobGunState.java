@@ -38,7 +38,7 @@ public interface IMobGunState {
         mtacz$setAimYawOffset(mtacz$getAimYawOffset() + delta);
     }
     default void mtacz$clampPitchOffset(float a, float b){
-        mtacz$setAimPitchOffset(Mth.clamp(a, mtacz$getAimPitchOffset(), b));
+        mtacz$setAimPitchOffset(Mth.clamp(mtacz$getAimPitchOffset(), a, b));
     }
     default void mtacz$clampYawOffset(float a, float b){
         mtacz$setAimYawOffset(Mth.clamp(mtacz$getAimYawOffset(), a, b));
