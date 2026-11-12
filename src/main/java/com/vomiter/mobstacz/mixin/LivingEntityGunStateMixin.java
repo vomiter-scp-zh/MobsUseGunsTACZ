@@ -7,6 +7,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,6 +16,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LivingEntity.class)
 public class LivingEntityGunStateMixin implements IMobGunState {
+
+    @Unique
+    @Nullable
+    private Boolean mtacz$additionalShootCooldownOverride;
+
+    @Override
+    @Nullable
+    public Boolean mtacz$getAdditionalShootCooldownOverride() {
+        return mtacz$additionalShootCooldownOverride;
+    }
+
+    @Override
+    public void mtacz$setAdditionalShootCooldownOverride(@Nullable Boolean enabled) {
+        mtacz$additionalShootCooldownOverride = enabled;
+    }
 
     @Unique
     private GunMode mode;

@@ -5,8 +5,10 @@ import com.tacz.guns.api.entity.ShootResult;
 import com.tacz.guns.api.item.IGun;
 import com.vomiter.mobstacz.Config;
 import com.vomiter.mobstacz.common.entity.MobGunUtils;
+import com.vomiter.mobstacz.common.registry.ModEntityTypeTags;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -26,6 +28,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
 
 
     private int nextAttackTick;
+    private int additionalShootCooldownTicks;
     private int unseenTicks;
 
     // 射擊後準心飄移
@@ -84,6 +87,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
     public void start() {
         //MobsTacz.LOGGER.info("[MTACZ] fire start");
         nextAttackTick = 0;
+        additionalShootCooldownTicks = 0;
         unseenTicks = 0;
     }
 
@@ -92,6 +96,7 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         //MobsTacz.LOGGER.info("[MTACZ] fire stop");
         movement.stop(shooter);
         nextAttackTick = 0;
+        additionalShootCooldownTicks = 0;
         unseenTicks = 0;
     }
 
@@ -138,12 +143,34 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
             return;
         }
 
-        tryOperateGun(finalPitch, finalYaw);
+        IMobGunState shooterState = (IMobGunState) shooter;
+        if (additionalShootCooldownTicks > 0) {
+            if (shouldApplyAdditionalCooldown(shooterState)) {
+                additionalShootCooldownTicks--;
+                return;
+            }
+            additionalShootCooldownTicks = 0;
+        }
+
+        tryOperateGun(finalPitch, finalYaw, shooterState);
     }
 
-    private void tryOperateGun(float finalPitch, float finalYaw) {
+    private boolean shouldApplyAdditionalCooldown(IMobGunState state) {
+        Boolean override = state.mtacz$getAdditionalShootCooldownOverride();
+        if (override != null) {
+            return override;
+        }
+
+        EntityType<?> type = shooter.getType();
+        if (type.is(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_BLACKLIST)) {
+            return false;
+        }
+        return type.is(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_WHITELIST)
+                || Config.ADDITIONAL_SHOOT_COOLDOWN;
+    }
+
+    private void tryOperateGun(float finalPitch, float finalYaw, IMobGunState shooterState) {
         IGunOperator gunOperator = IGunOperator.fromLivingEntity(shooter);
-        IMobGunState shooterState = (IMobGunState) shooter;
         ShootResult result = gunOperator.shoot(() -> finalPitch + shooterState.mtacz$getAimPitchOffset(), () -> finalYaw + shooterState.mtacz$getAimYawOffset());
         handleShootResult(result, gunOperator, shooterState);
     }
@@ -174,10 +201,9 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
         switch (result) {
             case SUCCESS -> {
                 applyRecoilDrift();
-                nextAttackTick = randomBetween(
-                        minAttackInterval,
-                        maxAttackInterval
-                );
+                if (shouldApplyAdditionalCooldown(state)) {
+                    additionalShootCooldownTicks = randomBetween(minAttackInterval, maxAttackInterval);
+                }
                 if(Config.MOB_GLOWS_AFTER_SHOOTING){
                     shooter.addEffect(new MobEffectInstance(MobEffects.GLOWING, 200, 0));
                 }
@@ -206,7 +232,9 @@ public class CrazyShooterShootingGoal extends Goal implements IShootingGoal {
                 state.mtacz$setMode(GunMode.RELOAD);
             }
 
-            case COOL_DOWN, IS_DRAWING, IS_BOLTING -> {
+            case COOL_DOWN -> nextAttackTick = 0;
+
+            case IS_DRAWING, IS_BOLTING -> {
                 nextAttackTick = 4;
             }
 

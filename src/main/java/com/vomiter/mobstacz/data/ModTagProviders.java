@@ -59,6 +59,8 @@ public class ModTagProviders {
         @Override
         protected void addTags(HolderLookup.@NotNull Provider lookupProvider) {
             tag(ModEntityTypeTags.GUN_EQUIP_BLACKLIST);
+            tag(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_WHITELIST);
+            tag(ModEntityTypeTags.ADDITIONAL_SHOOT_COOLDOWN_BLACKLIST);
         }
     }
 

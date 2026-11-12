@@ -9,6 +9,11 @@ public final class ModEntityTypeTags {
     public static final TagKey<EntityType<?>> GUN_EQUIP_BLACKLIST = TagKey.create(
             Registries.ENTITY_TYPE, MobsTacz.modLoc("gun_equip_blacklist"));
 
+    public static final TagKey<EntityType<?>> ADDITIONAL_SHOOT_COOLDOWN_WHITELIST = TagKey.create(
+            Registries.ENTITY_TYPE, MobsTacz.modLoc("additional_shoot_cooldown_whitelist"));
+    public static final TagKey<EntityType<?>> ADDITIONAL_SHOOT_COOLDOWN_BLACKLIST = TagKey.create(
+            Registries.ENTITY_TYPE, MobsTacz.modLoc("additional_shoot_cooldown_blacklist"));
+
     private ModEntityTypeTags() {
     }
 }
